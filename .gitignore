@@ -1,0 +1,4 @@
+models/
+data/igc_books/
+data/small_val_data/
+__pycache__/
