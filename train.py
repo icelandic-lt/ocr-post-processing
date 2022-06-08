@@ -199,5 +199,3 @@ if __name__ == '__main__':
         outf.write('TGT_VOCAB_SIZE = ' + str(TGT_VOCAB_SIZE) + '\n')
         outf.write('ORIGINAL_FILES = ' + "'" + str(ORIGINAL_FILES) + "'" + '\n')
         outf.write('CORRECTED_FILES = ' + "'" + str(CORRECTED_FILES) + "'" + '\n')
-
-        #outf.write('WEIGHT_DECAY = ' + str(params.WEIGHT_DECAY) + '\n')
