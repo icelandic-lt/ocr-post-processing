@@ -12,8 +12,35 @@ Sökum þess hve lítið magn leiðréttra ljóslesinna texta fyrirfinnst eru þ
 |   rn   |   m   |  166    |
 |   ri   |   n   |  19    |
 
-### Ferlið
+### Ferli
 
-Áður en hægt er að þjálfa líkanið þarf að sækja villur í ljóslesnu skjölin, svo hægt sé að setja þau inn í raunverulegu textana:
+Áður en hægt er að þjálfa líkanið þarf að setja upp nauðsynleg gögn, þ.m.t. Pandas-gagnaramma (e. **dataframe**), SQLite-gagnagrunn og villuskjöl:
 
+`$ python3 setup.py`
 
+Athugið að áður en þessi skrifta er keyrð þarf að skilgreina nokkrar breytur í `globals.py`:
+
+`ORIGINAL_FILES = 'mappan/sem/ljóslesin/gögn/eru/í'` </br>
+`CORRECTED_FILES = 'mappan/sem/leiðréttu/gögnin/eru/í'` </br>
+`ORIGINAL_VAL_FILES = 'mappan/sem/ljóslesnu/matsgögnin/eru/í'` </br>
+`CORRECTED_VAL_FILES = 'mappan/sem/leiðréttu/matsgögnin/eru/í'` </br>
+
+Næst þarf að þjálfa tilreiðara (e. **tokenizer**):
+
+`$ python3 train_wordpiece_tokenizer.py --vocab-size 3000 --min-freq 3 --corpus móðurmappa/ljóslesinna/texta`
+
+Þessi skrifta „þjálfar“ WordPiece-tilreiðara.
+
+`--vocab-size` ræður því niður í hversu marga orðhluta textarnir eru brotnir. </br>
+`--min-freq` ræður því hversu oft orðhluti þarf að koma fyrir í textanum til að vera talinn með. </br>
+`--corpus` vísar til möppunnar sem inniheldur ljóslesna og leiðrétta texta en uppbygging hennar þarf að vera með þessum hætti:
+```
+parent_dir
+└───original
+|    |    original_1.txt
+|    |    original_2.txt
+|
+└───corrected
+|    |    corrected_1.txt
+|    |    corrected_2.txt
+```
