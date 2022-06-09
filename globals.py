@@ -2,9 +2,9 @@ from glob import glob
 from sys import modules
 import pandas
 from transformers import BertTokenizer
+from pathlib import Path
 
-print(modules['__main__'].__file__)
-
+calling_module = Path(modules['__main__'].__file__).stem
 
 TEST_RUN = False
 
@@ -26,8 +26,9 @@ else:
     ORIGINAL_VAL_FILES = 'data/mid_val_data/original'
     CORRECTED_VAL_FILES = 'data/mid_val_data/corrected'
 
-TRAINING_DATA = pandas.read_pickle('dataframes/training_data.pickle')
-VALIDATION_DATA = pandas.read_pickle('dataframes/validation_data.pickle')
+if calling_module not == 'setup':
+    TRAINING_DATA = pandas.read_pickle('dataframes/training_data.pickle')
+    VALIDATION_DATA = pandas.read_pickle('dataframes/validation_data.pickle')
 
 def get_vocab(vocab_file):
     with open(vocab_file, 'r') as vocab:
