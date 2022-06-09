@@ -3,7 +3,7 @@ from sys import _getframe
 import pandas
 from transformers import BertTokenizer
 
-caller = _getframe(1)
+inspect.currentframe().f_back
 print(caller.f_globals['__name__'])
 
 
