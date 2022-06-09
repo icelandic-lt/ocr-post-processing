@@ -3,7 +3,7 @@ from sys import modules
 import pandas
 from transformers import BertTokenizer
 
-print(modules['__main__'])
+print(modules['__main__'].__file__)
 
 
 TEST_RUN = False
