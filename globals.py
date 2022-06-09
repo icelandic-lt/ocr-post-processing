@@ -26,7 +26,7 @@ else:
     ORIGINAL_VAL_FILES = 'data/mid_val_data/original'
     CORRECTED_VAL_FILES = 'data/mid_val_data/corrected'
 
-if calling_module not == 'setup':
+if calling_module != 'setup':
     TRAINING_DATA = pandas.read_pickle('dataframes/training_data.pickle')
     VALIDATION_DATA = pandas.read_pickle('dataframes/validation_data.pickle')
 
