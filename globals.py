@@ -1,10 +1,9 @@
 from glob import glob
-import inspect
+from sys import modules
 import pandas
 from transformers import BertTokenizer
 
-caller = inspect.currentframe().f_back
-print(caller.f_globals['__name__'])
+print(sys.modules['__main__'])
 
 
 TEST_RUN = False
