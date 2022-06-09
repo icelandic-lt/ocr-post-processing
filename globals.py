@@ -1,5 +1,5 @@
 from glob import glob
-from sys import _getframe
+import inspect
 import pandas
 from transformers import BertTokenizer
 
