@@ -182,7 +182,7 @@ if __name__ == '__main__':
             ep_info = f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}, "f"Epoch time = {(end_time - start_time):.3f}s"
             print(ep_info)
             outfile.write(ep_info + '\n')
-    torch.save(TRANSFORMER.state_dict(), f'models/{name}.model')
+            torch.save(TRANSFORMER.state_dict(), f'models/{name}_EPOCH_{epoch}.model')
     with open(f'hyperparams/{name}.py', 'w', encoding='utf-8') as outf:
         outf.write('VOCAB_SIZE = ' + str(tokenizer_vocab_size) + '\n')
         outf.write('VOCAB_MIN_FREQ = ' + str(TOKENIZER).split('_')[-1][:-1] + '\n')
