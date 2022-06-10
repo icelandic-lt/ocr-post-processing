@@ -2,7 +2,8 @@
 
 Þessi gagnahirsla inniheldur tól til þess að þjálfa ljóslestrarvilluleiðréttingarlíkan.
 
-Sökum þess hve lítið magn leiðréttra ljóslesinna texta fyrirfinnst eru þeir, í núverandi mynd kóðagrunnsins, notaðir til þess að kortleggja villur og einnig sem matsgögn (e. **validation data**) við þjálfun líkansins. Villurnar úr þessum textum eru svo settar af handahófi inn í venjulega texta, sem notandi þarf að útvega sjálfur (t.d. úr [Risamálheildinni](https://repository.clarin.is/repository/xmlui/handle/20.500.12537/192)), og þeir eru svo notaðir sem þjálfunargögn (e. **training data**). Dæmi um villurnar má sjá hér:
+Sökum þess hve lítið magn leiðréttra ljóslesinna texta fyrirfinnst eru ljóslestrarvillurnar í þeim sóttar og þær svo settar inn í venjulega texta sem notandi þarf að útvega sjálfur, t.d. úr [Risamálheildinni](https://repository.clarin.is/repository/xmlui/handle/20.500.12537/192). Notandi þarf einnig sjálfur að sjá um að skipta gögunum í þjálfunar-, mats- og prófunargögn.
+
 
 | orig | corr | freq |
 |:------:|:------:|:------:|
@@ -14,7 +15,18 @@ Sökum þess hve lítið magn leiðréttra ljóslesinna texta fyrirfinnst eru þ
 
 ### Ferli
 
-Fyrsta skrefið er að setja saman gagnasafn, sem samanstendur af ljóslesnum textum og leiðréttum útgáfum þeirra. Í þessari gagnahirslu er að finna u.þ.b. 50.000 línur af slíkum samhliða gögnum en þær duga tæplega til þess að þjálfa
+Fyrsta skrefið er að setja saman gagnasafn, sem samanstendur af ljóslesnum textum og leiðréttum útgáfum þeirra. Í þessari gagnahirslu er að finna u.þ.b. 50.000 línur af slíkum samhliða gögnum, sem duga þó tæplega til þess að þjálfa gott módel og því er hægt að drýgja þær með því að setja villurnar úr þeim inn í venjulega texta. Þessi gögn skulu sett upp á þessu sniði og mikilvægt er að ljóslesnu gögnin (það á einnig við um venjulegu textana sem villurnar hafa verið settar inn í) séu í möppu sem heitir `corrected` og að leiðréttu gögnin (einnig venjulegu textarnir án villna) séu í möppu sem heitir `corrected`.
+
+```
+parent_dir
+└───original
+|    |    original_1.txt
+|    |    original_2.txt
+|
+└───corrected
+|    |    corrected_1.txt
+|    |    corrected_2.txt
+```
 
 Áður en hægt er að þjálfa líkanið þarf að setja upp nauðsynleg gögn, þ.m.t. Pandas-gagnaramma (e. **dataframe**), SQLite-gagnagrunn og villuskjöl:
 
@@ -36,13 +48,3 @@ Næst þarf að þjálfa tilreiðara (e. **tokenizer**):
 `--vocab-size` ræður því niður í hversu marga orðhluta textarnir eru brotnir. </br>
 `--min-freq` ræður því hversu oft orðhluti þarf að koma fyrir í textanum til að vera talinn með. </br>
 `--corpus` vísar til möppunnar sem inniheldur ljóslesna og leiðrétta texta en uppbygging hennar þarf að vera með þessum hætti:
-```
-parent_dir
-└───original
-|    |    original_1.txt
-|    |    original_2.txt
-|
-└───corrected
-|    |    corrected_1.txt
-|    |    corrected_2.txt
-```
