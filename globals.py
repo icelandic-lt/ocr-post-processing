@@ -17,15 +17,12 @@ if TEST_RUN:
     CORRECTED_VAL_FILES = 'data/toy_corpus/validation/corrected'
 
 else:
-    # ORIGINAL_FILES = 'data/igc_books/original'
-    # CORRECTED_FILES = 'data/igc_books/corrected'
-    # ORIGINAL_VAL_FILES = 'data/parallel/50k_gold/original/'
-    # CORRECTED_VAL_FILES = 'data/parallel/50k_gold/corrected/'
     ORIGINAL_FILES = 'data/combined/original'
     CORRECTED_FILES = 'data/combined/corrected'
     ORIGINAL_VAL_FILES = 'data/mid_val_data/original'
     CORRECTED_VAL_FILES = 'data/mid_val_data/corrected'
 
+# These files don't exist when setup.py is run.
 if calling_module != 'setup':
     TRAINING_DATA = pandas.read_pickle('dataframes/training_data.pickle')
     VALIDATION_DATA = pandas.read_pickle('dataframes/validation_data.pickle')

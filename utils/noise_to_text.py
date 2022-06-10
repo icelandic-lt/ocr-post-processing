@@ -32,8 +32,7 @@ def noise_file(file):
             for ngr in gen_non_overlapping_ngrams(token.clean, curr_ngr):
                 out_ngr = ngr
                 if swap:
-                    possible_replacements = get_char_errors(ngr, freq=4)
-                    print(possible_replacements)
+                    possible_replacements = get_char_errors(ngr, freq=3)
                     if possible_replacements:
                         if randrange(10) < 5:
                             #out_ngr = sample(possible_replacements, 1)[0][0]

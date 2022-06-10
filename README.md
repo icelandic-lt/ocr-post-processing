@@ -15,7 +15,26 @@ Sökum þess hve lítið magn leiðréttra ljóslesinna texta fyrirfinnst eru lj
 
 ### Ferli
 
-Fyrsta skrefið er að setja saman gagnasafn, sem samanstendur af ljóslesnum textum og leiðréttum útgáfum þeirra. Í þessari gagnahirslu er að finna u.þ.b. 50.000 línur af slíkum samhliða gögnum, sem duga þó tæplega til þess að þjálfa gott módel og því er hægt að drýgja þær með því að setja villurnar úr þeim inn í venjulega texta. Þessi gögn skulu sett upp á þessu sniði og mikilvægt er að ljóslesnu gögnin (það á einnig við um venjulegu textana sem villurnar hafa verið settar inn í) séu í möppu sem heitir `corrected` og að leiðréttu gögnin (einnig venjulegu textarnir án villna) séu í möppu sem heitir `corrected`.
+Fyrsta skrefið er að þjálfa tilreiðara (e. *tokenizer*). </br>
+`$ python3 train_wordpiece_tokenizer.py --vocab-size 3000 --min-freq 3 --corpus data/parallel/50k_gold`. </br>
+Mappan sem vísað er til þarf að innihalda ljóslesna texta og leiðréttar útgáfur þeirra en ekki þó endilega gagnasafnið í heild sinni. Því er hægt að nota gögnin í `data/paralell/50k_gold` sem þjálfunargögn. Athugið að **mikilvægt er að sami tilreiðarinn sé notaður við uppsetningu gagnanna, þjálfun og prófun.**
+
+Að tilreiðara þjálfuðum þarf að sækja ljóslestrarvillurnar í grunngögnin (`data/parallel/50k_gold`) og setja upp villuskjal og -gagnagrunn:
+
+`$ python3 setup.py --errors`
+
+Athugið að staðsetning gagnanna er harðkóðuð inn í `setup.py`.
+
+
+Þegar villugögnin hafa verið sett upp þarf að sækja venjulega texta (t.d. úr Risamálheildinni) og koma þeim einhvers staðar fyrir, t.d. í `data/ocr_dataset/corrected`. Þá er hægt að keyra ljóslestrarvillurnar inn í venjulegu textana.
+
+`cd utils`
+`$ python3 noise_to_corpus.py --corpus data/ocr_dataset/corrected`
+
+Þetta býr til möppu í `data/ocr_dataset` sem heitir `original` og þá eru þjálfunargögnin tilbúin en skilgreina þarf staðsetningu þeirra í `globals.py`.
+
+
+Fyrsta skrefið er að setja saman gagnasafn, sem samanstendur af ljóslesnum textum og leiðréttum útgáfum þeirra. Í þessari gagnahirslu er að finna u.þ.b. 50.000 línur af slíkum samhliða gögnum, sem duga þó tæplega til þess að þjálfa gott módel og því þarf að drýgja þær með því að setja villurnar úr þeim inn í venjulega texta. Þessi gögn skulu sett upp á sama sniði og í trénu hér fyrir neðan og mikilvægt er að ljóslesnu gögnin (það á einnig við um venjulegu textana sem villurnar hafa verið settar inn í) séu í möppu sem heitir `corrected` og að leiðréttu gögnin (einnig venjulegu textarnir án villna) séu í möppu sem heitir `corrected`.
 
 ```
 parent_dir
@@ -39,11 +58,10 @@ Athugið að áður en þessi skrifta er keyrð þarf að skilgreina nokkrar bre
 `ORIGINAL_VAL_FILES = 'mappan/sem/ljóslesnu/matsgögnin/eru/í'` </br>
 `CORRECTED_VAL_FILES = 'mappan/sem/leiðréttu/matsgögnin/eru/í'` </br>
 
-Næst þarf að þjálfa tilreiðara (e. **tokenizer**):
 
-`$ python3 train_wordpiece_tokenizer.py --vocab-size 3000 --min-freq 3 --corpus móðurmappa/ljóslesinna/texta`
 
-Þessi skrifta „þjálfar“ WordPiece-tilreiðara.
+
+Þessi skrifta þjálfar WordPiece-tilreiðara.
 
 `--vocab-size` ræður því niður í hversu marga orðhluta textarnir eru brotnir. </br>
 `--min-freq` ræður því hversu oft orðhluti þarf að koma fyrir í textanum til að vera talinn með. </br>
