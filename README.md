@@ -14,6 +14,8 @@ Sökum þess hve lítið magn leiðréttra ljóslesinna texta fyrirfinnst eru þ
 
 ### Ferli
 
+Fyrsta skrefið er að setja saman gagnasafn, sem samanstendur af ljóslesnum textum og leiðréttum útgáfum þeirra. Í þessari gagnahirslu er að finna u.þ.b. 50.000 línur af slíkum samhliða gögnum en þær duga tæplega til þess að þjálfa
+
 Áður en hægt er að þjálfa líkanið þarf að setja upp nauðsynleg gögn, þ.m.t. Pandas-gagnaramma (e. **dataframe**), SQLite-gagnagrunn og villuskjöl:
 
 `$ python3 setup.py`

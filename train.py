@@ -171,10 +171,10 @@ def evaluate(model):
 if __name__ == '__main__':
     now = datetime.now()
     tokenizer_vocab_size = len(wordpiece_vocab)
-    name = f'{Path(ORIGINAL_FILES).stem}_{params.EMB_SIZE}_{params.NHEAD}_{params.FFN_HID_DIM}_{params.BATCH_SIZE}_{params.NUM_ENCODER_LAYERS}_{params.NUM_DECODER_LAYERS}_{params.DROPOUT}_{params.NUM_EPOCHS}_{params.WEIGHT_DECAY}_{params.LEARNING_RATE}_{Path(TOKENIZER).stem}'
-    with open(f'val/{name}.txt', 'w', encoding='utf-8') as outfile:
-        NUM_EPOCHS = params.NUM_EPOCHS
-        for epoch in range(1, NUM_EPOCHS+1):
+    NUM_EPOCHS = params.NUM_EPOCHS
+    for epoch in range(1, NUM_EPOCHS+1):
+        name = f'{Path(ORIGINAL_FILES).stem}_{params.EMB_SIZE}_{params.NHEAD}_{params.FFN_HID_DIM}_{params.BATCH_SIZE}_{params.NUM_ENCODER_LAYERS}_{params.NUM_DECODER_LAYERS}_{params.DROPOUT}_{params.NUM_EPOCHS}_{params.WEIGHT_DECAY}_{params.LEARNING_RATE}_{Path(TOKENIZER).stem}_EPOCH_{epoch}'
+        with open(f'val/{name}.txt', 'w', encoding='utf-8') as outfile:
             start_time = timer()
             train_loss = train_epoch(TRANSFORMER, OPTIMIZER, TRAINING_DATASET)
             end_time = timer()
@@ -182,20 +182,20 @@ if __name__ == '__main__':
             ep_info = f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}, "f"Epoch time = {(end_time - start_time):.3f}s"
             print(ep_info)
             outfile.write(ep_info + '\n')
-            torch.save(TRANSFORMER.state_dict(), f'models/{name}_EPOCH_{epoch}.model')
-    with open(f'hyperparams/{name}.py', 'w', encoding='utf-8') as outf:
-        outf.write('VOCAB_SIZE = ' + str(tokenizer_vocab_size) + '\n')
-        outf.write('VOCAB_MIN_FREQ = ' + str(TOKENIZER).split('_')[-1][:-1] + '\n')
-        outf.write('EMB_SIZE = ' + str(params.EMB_SIZE) + '\n')
-        outf.write('NHEAD = ' + str(params.NHEAD) + '\n')
-        outf.write('FFN_HID_DIM = ' + str(params.FFN_HID_DIM) + '\n')
-        outf.write('BATCH_SIZE = ' + str(params.BATCH_SIZE) + '\n')
-        outf.write('NUM_ENCODER_LAYERS = ' + str(params.NUM_ENCODER_LAYERS) + '\n')
-        outf.write('NUM_DECODER_LAYERS = ' + str(params.NUM_DECODER_LAYERS) + '\n')
-        outf.write('DROPOUT = ' + str(params.DROPOUT) + '\n')
-        outf.write('NUM_EPOCHS = ' + str(params.NUM_EPOCHS) + '\n')
-        outf.write('LEARNING_RATE = ' + str(params.LEARNING_RATE) + '\n')
-        outf.write('SRC_VOCAB_SIZE = ' + str(SRC_VOCAB_SIZE) + '\n')
-        outf.write('TGT_VOCAB_SIZE = ' + str(TGT_VOCAB_SIZE) + '\n')
-        outf.write('ORIGINAL_FILES = ' + "'" + str(ORIGINAL_FILES) + "'" + '\n')
-        outf.write('CORRECTED_FILES = ' + "'" + str(CORRECTED_FILES) + "'" + '\n')
+            torch.save(TRANSFORMER.state_dict(), f'models/{name}.model')
+        with open(f'hyperparams/{name}.py', 'w', encoding='utf-8') as outf:
+            outf.write('VOCAB_SIZE = ' + str(tokenizer_vocab_size) + '\n')
+            outf.write('VOCAB_MIN_FREQ = ' + str(TOKENIZER).split('_')[-1][:-1] + '\n')
+            outf.write('EMB_SIZE = ' + str(params.EMB_SIZE) + '\n')
+            outf.write('NHEAD = ' + str(params.NHEAD) + '\n')
+            outf.write('FFN_HID_DIM = ' + str(params.FFN_HID_DIM) + '\n')
+            outf.write('BATCH_SIZE = ' + str(params.BATCH_SIZE) + '\n')
+            outf.write('NUM_ENCODER_LAYERS = ' + str(params.NUM_ENCODER_LAYERS) + '\n')
+            outf.write('NUM_DECODER_LAYERS = ' + str(params.NUM_DECODER_LAYERS) + '\n')
+            outf.write('DROPOUT = ' + str(params.DROPOUT) + '\n')
+            outf.write('NUM_EPOCHS = ' + str(params.NUM_EPOCHS) + '\n')
+            outf.write('LEARNING_RATE = ' + str(params.LEARNING_RATE) + '\n')
+            outf.write('SRC_VOCAB_SIZE = ' + str(SRC_VOCAB_SIZE) + '\n')
+            outf.write('TGT_VOCAB_SIZE = ' + str(TGT_VOCAB_SIZE) + '\n')
+            outf.write('ORIGINAL_FILES = ' + "'" + str(ORIGINAL_FILES) + "'" + '\n')
+            outf.write('CORRECTED_FILES = ' + "'" + str(CORRECTED_FILES) + "'" + '\n')
