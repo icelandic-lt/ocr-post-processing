@@ -86,13 +86,14 @@ def translate(model: torch.nn.Module, src_sentence: str):
     tgt_tokens = greedy_decode(model, src, src_mask,
                                max_len=num_tokens + 5,
                                start_symbol=BOS_IDX).flatten()
-    outp = (vocab_transform[TGT_LANGUAGE].lookup_tokens(list(tgt_tokens.cpu().numpy())))#.replace("<bos>", "").replace("<eos>", "")
+    outp = (vocab_transform[TGT_LANGUAGE].lookup_tokens(list(tgt_tokens.cpu().numpy())))
     outp = ' '.join(outp).replace(' <unk> <unk> ', '')
     outp = outp.replace(' ##', '')
     outp = outp.replace(' # # ', '')
+    outp = outp.replace('<bos>', '').replace('<eos>', '')
     outp = correct_spaces(outp)
-    outp = outp.replace('<bos> ', '').replace('<eos>', '')
-
+    if outp.endswith(' '):
+        outp = outp[:-1]
     return outp
 
 if __name__ == '__main__':

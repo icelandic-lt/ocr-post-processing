@@ -16,6 +16,8 @@ def get_char_errors(ngr, freq=10):
 def gen_non_overlapping_ngrams(chars, ngr):
     return [chars[i:i + ngr] for i in range(0, len(chars), ngr)]
 
+def count_chars(token):
+    return len([char for char in token if char.isalpha()])
 
 class TextToken:
     def __init__(self, token):
@@ -29,7 +31,7 @@ class TextToken:
 
         # The longest character string (possibly including a hyphen)
         # of self.token_and_punct
-        self.clean = max(self.token_and_punct, key=len)
+        self.clean = max(self.token_and_punct, key=count_chars)
 
         self.startswith_punct = self.original_token[0] in punctuation
         self.endswith_punct = (self.original_token[-1] in punctuation

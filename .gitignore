@@ -1,5 +1,8 @@
+__pycache__/
 data/igc_books/
 data/small_val_data/
 data/combined/
 data/mid_val_data/
-__pycache__/
+textasafn_arnastofnun/
+data/ocr_books_textasafn/
+utils/infer_helpers.py
