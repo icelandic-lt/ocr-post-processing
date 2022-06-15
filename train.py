@@ -173,7 +173,7 @@ if __name__ == '__main__':
     tokenizer_vocab_size = len(wordpiece_vocab)
     NUM_EPOCHS = params.NUM_EPOCHS
     for epoch in range(1, NUM_EPOCHS+1):
-        name = f'{Path(ORIGINAL_FILES).stem}_{params.EMB_SIZE}_{params.NHEAD}_{params.FFN_HID_DIM}_{params.BATCH_SIZE}_{params.NUM_ENCODER_LAYERS}_{params.NUM_DECODER_LAYERS}_{params.DROPOUT}_{params.NUM_EPOCHS}_{params.WEIGHT_DECAY}_{params.LEARNING_RATE}_{Path(TOKENIZER).stem}_EPOCH_{epoch}'
+        name = f'{Path(ORIGINAL_FILES).stem}_{SRC_VOCAB_SIZE}_{params.EMB_SIZE}_{params.NHEAD}_{params.FFN_HID_DIM}_{params.BATCH_SIZE}_{params.NUM_ENCODER_LAYERS}_{params.NUM_DECODER_LAYERS}_{params.DROPOUT}_{params.NUM_EPOCHS}_{params.WEIGHT_DECAY}_{params.LEARNING_RATE}_{Path(TOKENIZER).stem}_EPOCH_{epoch}'
         with open(f'val/{name}.txt', 'w', encoding='utf-8') as outfile:
             start_time = timer()
             train_loss = train_epoch(TRANSFORMER, OPTIMIZER, TRAINING_DATASET)
