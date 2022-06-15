@@ -19,12 +19,17 @@ if TEST_RUN:
 else:
     # ORIGINAL_FILES = 'data/combined/original'
     # CORRECTED_FILES = 'data/combined/corrected'
-    # ORIGINAL_VAL_FILES = 'data/mid_val_data/original'
-    # CORRECTED_VAL_FILES = 'data/mid_val_data/corrected'
-    ORIGINAL_FILES = 'data/50k_test/training/original'
-    CORRECTED_FILES = 'data/50k_test/training/corrected'
-    ORIGINAL_VAL_FILES = 'data/50k_test/validation/original'
-    CORRECTED_VAL_FILES = 'data/50k_test/validation/corrected'
+    ORIGINAL_VAL_FILES = 'data/mid_val_data/original'
+    CORRECTED_VAL_FILES = 'data/mid_val_data/corrected'
+    #ORIGINAL_FILES = 'data/50k_test/training/original'
+    #CORRECTED_FILES = 'data/50k_test/training/corrected'
+    #ORIGINAL_VAL_FILES = 'data/50k_test/validation/original'
+    #CORRECTED_VAL_FILES = 'data/50k_test/validation/corrected'
+    ORIGINAL_FILES = 'data/ocr_textasafn/original'
+    CORRECTED_FILES = 'data/ocr_textasafn/corrected'
+    #ORIGINAL_VAL_FILES = 'data/ocr_textasafn'
+    #CORRECTED_VAL_FILES = 'data/ocr_textasafn'
+
 
 # These files don't exist when setup.py is run.
 if calling_module != 'setup':
