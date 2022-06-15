@@ -9,10 +9,11 @@ def read_lines(file):
     with open(file, 'r', encoding='utf-8') as infile:
         for line in infile.read().splitlines():
             for sentence in list(split_into_sentences(line)):
-                if len(' '.join(sentence)) < 128:
-                    yield correct_spaces(sentence)
+                sentence = correct_spaces(sentence)
+                if len(sentence) < 128:
+                    yield sentence
                 else:
-                    sentence_chunks = gen_non_overlapping_ngrams(sentence.split(), 8)
+                    sentence_chunks = gen_non_overlapping_ngrams(sentence.split(), 64)
                     for chunk in sentence_chunks:
                         yield correct_spaces(' '.join(chunk))
 

@@ -31,8 +31,8 @@ def noise_file(file):
             ngr = [1, 1, 1, 2, 2, 3]
             # A random noise ngram picked.
             curr_ngr = sample(ngr, 1)[0]
-            # Random noise is added if swap is less than 3, i.e. 33% of the time.
-            swap = randrange(10) < 3
+            # Random noise is added if swap is less than 2, i.e. 20% of the time.
+            swap = randrange(10) < 2
             out_tok = ''
             for ngr in gen_non_overlapping_ngrams(token.clean, curr_ngr):
                 # out_ngr is initialized as an ngram from the (correct) token
@@ -55,8 +55,12 @@ def noise_file(file):
                             out_ngr = ngr
                 out_tok += out_ngr
             out_tok = format_token_out(out_tok, start_punct, end_punct)
+            add_spaces_between_all_chars = randrange(100) == 66
+            if add_spaces_between_all_chars:
+                out_tok = ' '.join(out_tok)
             line_out += out_tok
         delete_space = randrange(33)
+        # Just a random number, less than 33
         if delete_space == 19:
             space_indexes = [index for index in range(len(line_out)) if line_out.startswith(' ', index)]
             if space_indexes:
