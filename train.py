@@ -40,8 +40,8 @@ PAD_IDX = SPECIAL_SYMBOLS.index('<pad>')
 BOS_IDX = SPECIAL_SYMBOLS.index('<bos>')
 EOS_IDX = SPECIAL_SYMBOLS.index('<eos>')
 
-TRAINING_DATASET = OCRDataset(df=TRAINING_DATA, source_column='original', target_column='corrected')
-VALIDATION_DATASET = OCRDataset(df=VALIDATION_DATA, source_column='original', target_column='corrected')
+TRAINING_DATASET = OCRDataset(df=TRAINING_DATA, source_column=SRC_LANGUAGE', target_column=TGT_LANGUAGE)
+VALIDATION_DATASET = OCRDataset(df=VALIDATION_DATA, source_column=SRC_LANGUAGE', target_column=TGT_LANGUAGE)
 
 
 token_transform = {}

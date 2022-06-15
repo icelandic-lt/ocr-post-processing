@@ -61,7 +61,7 @@ def noise_file(file):
             space_indexes = [index for index in range(len(line_out)) if line_out.startswith(' ', index)]
             if space_indexes:
                 random_index = sample(space_indexes, 1)[0]
-                line_out = line_out.replace(line_out[random_index], '')
+                line_out = line_out[:random_index] + line_out[random_index+1:]
         yield line_out
 
 if __name__ == '__main__':

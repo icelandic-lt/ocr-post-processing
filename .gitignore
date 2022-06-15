@@ -6,3 +6,6 @@ data/mid_val_data/
 textasafn_arnastofnun/
 data/ocr_books_textasafn/
 utils/infer_helpers.py
+data/all_texts_no_split/
+data/ocr_books/
+data/old_texts/
