@@ -3,7 +3,7 @@ from general_token import gen_non_overlapping_ngrams
 from glob import glob
 from pathlib import Path
 
-all_files = glob('../data/textasafn_arnastofnun/corrected/*')
+all_files = glob('../data/textasafn_arnastofnun/*')
 
 def read_lines(file):
     with open(file, 'r', encoding='utf-8') as infile:
@@ -13,7 +13,7 @@ def read_lines(file):
                 if len(sentence) < 128:
                     yield sentence
                 else:
-                    sentence_chunks = gen_non_overlapping_ngrams(sentence.split(), 64)
+                    sentence_chunks = gen_non_overlapping_ngrams(sentence.split(), 8)
                     for chunk in sentence_chunks:
                         yield correct_spaces(' '.join(chunk))
 
