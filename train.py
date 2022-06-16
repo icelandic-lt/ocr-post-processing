@@ -43,6 +43,7 @@ EOS_IDX = SPECIAL_SYMBOLS.index('<eos>')
 TRAINING_DATASET = OCRDataset(df=TRAINING_DATA, source_column=SRC_LANGUAGE, target_column=TGT_LANGUAGE)
 VALIDATION_DATASET = OCRDataset(df=VALIDATION_DATA, source_column=SRC_LANGUAGE, target_column=TGT_LANGUAGE)
 
+print(len(training_dataset))
 
 token_transform = {}
 vocab_transform = {}
