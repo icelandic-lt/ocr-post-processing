@@ -8,7 +8,7 @@ calling_module = Path(modules['__main__'].__file__).stem
 
 TEST_RUN = False
 
-TOKENIZER = 'ocr_tokenizers/3000_3/'
+TOKENIZER = 'ocr_tokenizers/5000_3/'
 
 if TEST_RUN:
     ORIGINAL_FILES = 'data/toy_corpus/training/original'
@@ -19,16 +19,20 @@ if TEST_RUN:
 else:
     # ORIGINAL_FILES = 'data/combined/original'
     # CORRECTED_FILES = 'data/combined/corrected'
-    ORIGINAL_VAL_FILES = 'data/mid_val_data/original'
-    CORRECTED_VAL_FILES = 'data/mid_val_data/corrected'
+    #ORIGINAL_VAL_FILES = 'data/mid_val_data/original'
+    #CORRECTED_VAL_FILES = 'data/mid_val_data/corrected'
     #ORIGINAL_FILES = 'data/50k_test/training/original'
     #CORRECTED_FILES = 'data/50k_test/training/corrected'
     #ORIGINAL_VAL_FILES = 'data/50k_test/validation/original'
     #CORRECTED_VAL_FILES = 'data/50k_test/validation/corrected'
-    ORIGINAL_FILES = 'data/ocr_textasafn/original'
-    CORRECTED_FILES = 'data/ocr_textasafn/corrected'
+    #ORIGINAL_FILES = 'data/ocr_textasafn/original'
+    #CORRECTED_FILES = 'data/ocr_textasafn/corrected'
     #ORIGINAL_VAL_FILES = 'data/ocr_textasafn'
     #CORRECTED_VAL_FILES = 'data/ocr_textasafn'
+    ORIGINAL_FILES = 'data/1m/training/original'
+    CORRECTED_FILES = 'data/1m/training/corrected'
+    ORIGINAL_VAL_FILES = 'data/1m/validation/original'
+    CORRECTED_VAL_FILES = 'data/1m/validation/corrected'
 
 
 # These files don't exist when setup.py is run.
