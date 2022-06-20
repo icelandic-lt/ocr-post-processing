@@ -106,6 +106,7 @@ if __name__ == '__main__':
     N_LINES = len(sents)
     with open(outfile, 'w', encoding='utf-8') as outf:
         for sent in sents:
+            print(sent)
             encoded_sent = sent
             COUNTER += 1
             #encoded_sent = ' '.join(OCR_TOKENIZER(sent))
