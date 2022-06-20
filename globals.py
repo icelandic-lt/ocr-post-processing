@@ -47,8 +47,12 @@ def get_vocab(vocab_file):
 
 def read_lines(file, tokenizer):
     with open(file, 'r', encoding='utf-8') as infile:
-        for line in infile:
-            yield tokenizer(line)
+        for (index, line) in enumerate(infile):
+            line1 = infile[index]
+            line2 = infile[index+1]
+            combined = line1 + line2
+            print(combined)
+            yield tokenizer(combined)
 
 def read_files(path, tokenizer):
     all_files = glob(f'{path}/*')
