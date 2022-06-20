@@ -52,9 +52,11 @@ def read_lines(file, tokenizer):
             if index+1 < len(infile):
                 line1 = infile[index].strip()
                 line2 = infile[index+1].strip()
-                combined = line1 + line2
+                combined = f'{line1}\n{line2}'
             else:
                 combined = line
+            print(combined)
+            print(tokenizer(combined))
             yield tokenizer(combined)
 
 def read_files(path, tokenizer):
