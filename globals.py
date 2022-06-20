@@ -55,8 +55,6 @@ def read_lines(file, tokenizer):
                 combined = f'{line1}▓{line2}'
             else:
                 combined = line
-            print(combined)
-            print(tokenizer(combined))
             yield tokenizer(combined)
 
 def read_files(path, tokenizer):
