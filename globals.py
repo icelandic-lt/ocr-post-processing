@@ -49,10 +49,12 @@ def read_lines(file, tokenizer):
     with open(file, 'r', encoding='utf-8') as infile:
         infile = infile.readlines()
         for (index, line) in enumerate(infile):
-            line1 = infile[index]
-            line2 = infile[index+1]
-            combined = line1 + line2
-            print(combined)
+            if index <= len(infile):
+                line1 = infile[index]
+                line2 = infile[index+1]
+                combined = line1 + line2
+            else:
+                combined = line
             yield tokenizer(combined)
 
 def read_files(path, tokenizer):
