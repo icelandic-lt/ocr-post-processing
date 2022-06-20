@@ -54,7 +54,6 @@ def read_lines(file, tokenizer):
                 line2 = infile[index+1].strip()
                 if line1.endswith('-'):
                     combined = line1 + line2
-                    print(combined)
                 else:
                     combined = line1
             else:

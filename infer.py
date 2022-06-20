@@ -16,7 +16,7 @@ punctuation += "–„”—«»"
 
 def read_file(file):
     with open(file, 'r', encoding='utf-8') as infile:
-        for line in  infile.read().splitlines():
+        for line in infile.read().splitlines():
             yield line
 
 parser = argparse.ArgumentParser()
