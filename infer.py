@@ -70,7 +70,6 @@ def greedy_decode(model, src, src_mask, max_len, start_symbol):
         prob = model.generator(out[:, -1])
         _, next_word = torch.max(prob, dim=1)
         next_word = next_word.item()
-
         ys = torch.cat([ys,
                         torch.ones(1, 1).type_as(src.data).fill_(next_word)], dim=0)
         if next_word == EOS_IDX:
@@ -103,20 +102,6 @@ if __name__ == '__main__':
     model_name = Path(args.model).stem
     outfile = f'test_data/outputs/{model_name}_{inp_filename}'
     sents = list(read_file(inp_file))
-    # sents = [
-    #    'þegar öllu er á botninn hvolft gengur ekki að ferðast um með skipi',
-    #    'kona lést á heimili sínu í gær',
-    #    'hesturinn sá hundinn',
-    #    'nokkrir pingmenn sátu fundinn',
-    #    'hjcr eru nokkrir pingmannanna',
-    #    'ckki gcra þetta elsku vinur',
-    #    'við skulum Iáta fóIkið afjálft vera',
-    #    'af mörgu er nú ad taka',
-    #    'ekki láta svona',
-    #    'það voru margir scm vildu ekki Iáta sjá sig með þér',
-    #    'Gunnar Ólafssson er mættur á svæðið',
-    #    'ég hringi í þig og svaraðu þá símanum'
-    # ]
     COUNTER = 0
     N_LINES = len(sents)
     with open(outfile, 'w', encoding='utf-8') as outf:
