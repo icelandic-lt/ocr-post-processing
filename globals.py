@@ -52,7 +52,7 @@ def read_lines(file, tokenizer):
             if index+1 < len(infile):
                 line1 = infile[index].strip()
                 line2 = infile[index+1].strip()
-                combined = f'{line1}\n{line2}'
+                combined = f'{line1}__LINE_BREAK__{line2}'
             else:
                 combined = line
             print(combined)
