@@ -22,7 +22,7 @@ tokenizer = BertWordPieceTokenizer(
 
 tokenizer.train(files=paths, vocab_size=int(args.vocab_size), min_frequency=int(args.min_freq),
                 limit_alphabet=1000, wordpieces_prefix='##',
-                special_tokens= ['<unk>', '<pad>', '<bos>', '<eos>', '__LINE_BREAK__'])
+                special_tokens= ['<unk>', '<pad>', '<bos>', '<eos>', '▓'])
 
 
 
