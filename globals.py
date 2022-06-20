@@ -50,8 +50,8 @@ def read_lines(file, tokenizer):
         infile = infile.readlines()
         for (index, line) in enumerate(infile):
             if index+1 < len(infile):
-                line1 = strip(infile[index])
-                line2 = strip(infile[index+1])
+                line1 = infile[index].strip()
+                line2 = infile[index+1].strip()
                 if line1.endswith('-'):
                     combined = line1 + line2
                 else:
