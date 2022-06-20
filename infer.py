@@ -9,7 +9,7 @@ from train import (text_transform,
                    SRC_LANGUAGE,
                    TGT_LANGUAGE,
                    vocab_transform)
-from globals import OCR_TOKENIZER, wordpiece_vocab
+from globals import OCR_TOKENIZER, wordpiece_vocab, read_lines
 punctuation += "–„”—«»"
 
 
@@ -101,7 +101,7 @@ if __name__ == '__main__':
     inp_filename = Path(inp_file).name
     model_name = Path(args.model).stem
     outfile = f'test_data/outputs/{model_name}_{inp_filename}'
-    sents = list(read_file(inp_file))
+    sents = list(read_lines(inp_file))
     COUNTER = 0
     N_LINES = len(sents)
     with open(outfile, 'w', encoding='utf-8') as outf:
