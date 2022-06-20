@@ -52,7 +52,10 @@ def read_lines(file, tokenizer):
             if index+1 < len(infile):
                 line1 = infile[index]
                 line2 = infile[index+1]
-                combined = line1 + line2
+                if line1.endswith('-'):
+                    combined = line1 + line2
+                else:
+                    combined = line1
             else:
                 combined = line
             yield tokenizer(combined)
