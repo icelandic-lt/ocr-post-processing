@@ -58,6 +58,8 @@ def read_lines(file, tokenizer):
                     combined = line1
             else:
                 combined = line
+            print(combined)
+            print(tokenizer(combined))
             yield tokenizer(combined)
 
 def read_files(path, tokenizer):
