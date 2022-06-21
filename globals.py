@@ -56,7 +56,7 @@ bert_tokenizer = BertTokenizer.from_pretrained(
                     strip_accents=False,
                     do_lower_case=False,
                     clean_text=False,
-                    special_tokens= ['<unk>', '<pad>', '<bos>', '<eos>'])
+                    special_tokens= ['<unk>', '<pad>', '<bos>', '<eos>', '<newline>'])
 
 def tokenize(sequence):
     tokenized = bert_tokenizer(sequence).input_ids
