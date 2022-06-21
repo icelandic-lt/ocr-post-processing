@@ -17,18 +17,6 @@ if TEST_RUN:
     CORRECTED_VAL_FILES = 'data/toy_corpus/validation/corrected'
 
 else:
-    # ORIGINAL_FILES = 'data/combined/original'
-    # CORRECTED_FILES = 'data/combined/corrected'
-    #ORIGINAL_VAL_FILES = 'data/mid_val_data/original'
-    #CORRECTED_VAL_FILES = 'data/mid_val_data/corrected'
-    #ORIGINAL_FILES = 'data/50k_test/training/original'
-    #CORRECTED_FILES = 'data/50k_test/training/corrected'
-    #ORIGINAL_VAL_FILES = 'data/50k_test/validation/original'
-    #CORRECTED_VAL_FILES = 'data/50k_test/validation/corrected'
-    #ORIGINAL_FILES = 'data/ocr_textasafn/original'
-    #CORRECTED_FILES = 'data/ocr_textasafn/corrected'
-    #ORIGINAL_VAL_FILES = 'data/ocr_textasafn'
-    #CORRECTED_VAL_FILES = 'data/ocr_textasafn'
     ORIGINAL_FILES = 'data/1m/training/original'
     CORRECTED_FILES = 'data/1m/training/corrected'
     ORIGINAL_VAL_FILES = 'data/1m/validation/original'
@@ -52,7 +40,7 @@ def read_lines(file, tokenizer):
             if index+1 < len(infile):
                 line1 = infile[index].strip()
                 line2 = infile[index+1].strip()
-                combined = f'{line1}▓{line2}'
+                combined = f'{line1}<newline>{line2}'
             else:
                 combined = line
             yield tokenizer(combined)
