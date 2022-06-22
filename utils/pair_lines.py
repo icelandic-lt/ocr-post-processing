@@ -14,8 +14,8 @@ def read_lines(file):
                 second_half = lines[index].split('<newline>')[1]
             if index+2 < n_lines:
                 second_half_next_line = lines[index+1].split('<newline>')[1]
-
-            yield line
+            if index % 2 == 1:
+                yield f'{line[0].strip()}\n{line[1].strip()}'
 
 
 out_dir = '../test_data/outputs/'

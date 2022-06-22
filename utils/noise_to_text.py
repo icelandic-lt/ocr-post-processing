@@ -32,7 +32,7 @@ def noise_file(file):
             # A random noise ngram picked.
             curr_ngr = sample(ngr, 1)[0]
             # Random noise is added if swap is less than 1, i.e. in 10% of all tokens.
-            swap = randrange(10) < 1
+            swap = randrange(100) < 15
             out_tok = ''
             for ngr in gen_non_overlapping_ngrams(token.clean, curr_ngr):
                 # out_ngr is initialized as an ngram from the (correct) token
