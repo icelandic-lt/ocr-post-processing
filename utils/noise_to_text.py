@@ -31,8 +31,8 @@ def noise_file(file):
             ngr = [1, 1, 1, 2, 2, 3]
             # A random noise ngram picked.
             curr_ngr = sample(ngr, 1)[0]
-            # Random noise is added if swap is less than 2, i.e. 20% of the time.
-            swap = randrange(10) < 2
+            # Random noise is added if swap is less than 1, i.e. in 10% of all tokens.
+            swap = randrange(10) < 1
             out_tok = ''
             for ngr in gen_non_overlapping_ngrams(token.clean, curr_ngr):
                 # out_ngr is initialized as an ngram from the (correct) token
@@ -45,22 +45,30 @@ def noise_file(file):
                         edit = randrange(10)
                         if edit < 5:
                             # A known ngram error is inserted into a correct token, based on their log(frequency)
-                            # in the error database
+                            # in the error database. The training files are very homogeneous, so log(frequency) is
+                            # used to give a more balanced distribution and prevent overfitting.
                             out_ngr = choices([i for i, j in possible_replacements], [log(j, 2) for i, j in possible_replacements], k=1)[0]
                             swap = False
                         elif edit == 6:
+                            # Used to add some \s noise into the data, as that's a very common error type.
+                            # This block could be simplified.
                             if randrange(100) < 30:
                                 out_ngr = f' {out_ngr} '
                         else:
                             out_ngr = ngr
                 out_tok += out_ngr
             out_tok = format_token_out(out_tok, start_punct, end_punct)
+            # Add spaces between all characters of a word in 1% of all tokens.
+            # The frequency (1%) is not based on real data analysis.
+            # The number 66 is random and doesn't matter.
             add_spaces_between_all_chars = randrange(100) == 66
             if add_spaces_between_all_chars:
                 out_tok = ' '.join(out_tok)
             line_out += out_tok
         delete_space = randrange(33)
-        # Just a random number, less than 33
+        # Delete a space between two tokens in 3% of all lines.
+        # The frequency (3%) is not based on real data analysis.
+        # The number 19 is random and doesn't matter.
         if delete_space == 19:
             space_indexes = [index for index in range(len(line_out)) if line_out.startswith(' ', index)]
             if space_indexes:
