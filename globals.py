@@ -8,7 +8,7 @@ calling_module = Path(modules['__main__'].__file__).stem
 
 TEST_RUN = False
 
-TOKENIZER = 'ocr_tokenizers/5000_3/'
+TOKENIZER = 'ocr_tokenizers/3000_3/'
 
 if TEST_RUN:
     ORIGINAL_FILES = 'data/toy_corpus/training/original'

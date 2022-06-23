@@ -24,6 +24,8 @@ parser.add_argument('--model')
 parser.add_argument('--infile')
 args, unknown = parser.parse_known_args()
 
+print(Path(args.model).stem)
+
 params = import_module(f'hyperparams.{Path(args.model).stem}')
 
 
