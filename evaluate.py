@@ -31,10 +31,12 @@ def evaluate(original_file, corrected_file, transformed_file):
     #
     transformed_not_in_corrected = [line for (index, line) in transformed if (index, line) not in corrected_transformed_set]
     corrected_not_in_transformed = [line for (index, line) in corrected if (index, line) not in corrected_transformed_set]
+    for i in zip(transformed_not_in_corrected, corrected_not_in_transformed):
+        print(i)
+
     orig_corr_chrf = chrf_score.corpus_chrf(original_not_in_corrected, corrected_not_in_original)
     orig_trns_chrf = chrf_score.corpus_chrf(original_not_in_transformed, transformed_not_in_original)
     corr_trns_chrf = chrf_score.corpus_chrf(corrected_not_in_transformed, transformed_not_in_corrected)
-
     scores = {
         'Original/Corrected CHRF:': orig_corr_chrf,
         'Original/Transformed CHRF:': orig_trns_chrf,
