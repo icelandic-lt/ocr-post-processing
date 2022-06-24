@@ -169,7 +169,6 @@ def evaluate(model):
     return losses / len(VALIDATION_DATALOADER)
 
 if __name__ == '__main__':
-    now = datetime.now()
     tokenizer_vocab_size = len(wordpiece_vocab)
     NUM_EPOCHS = params.NUM_EPOCHS
     for epoch in range(1, NUM_EPOCHS+1):
@@ -180,7 +179,14 @@ if __name__ == '__main__':
             end_time = timer()
             val_loss = evaluate(TRANSFORMER)
             ep_info = f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}, "f"Epoch time = {(end_time - start_time):.3f}s"
-            print(ep_info)
+            now = datetime.now()
+            date = now.date()
+            month = date.month
+            day = date.day
+            time = now.time()
+            hours = time.hour
+            minute = time.minute
+            print(ep_info, f'({day}/{month} {hours}:{minute})')
             outfile.write(ep_info + '\n')
             torch.save(TRANSFORMER.state_dict(), f'models/{name}.model')
         with open(f'hyperparams/{name}.py', 'w', encoding='utf-8') as outf:
