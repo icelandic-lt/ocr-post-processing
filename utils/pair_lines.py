@@ -2,24 +2,30 @@ from islenska.bincompress import BinCompressed
 from islenska import Bin
 from string import punctuation
 import pickle
-from lexpy.dawg import DAWG
+# from lexpy.dawg import DAWG
 from Levenshtein import distance
-
-dawg = None
-with open ('../bin.dawg', 'rb') as p:
-    dawg = pickle.load(p)
+from substitution_token import get_similar_by_known_subs
+from itertools import chain
+import re
 
 punctuation += "–„”—«»"
 
 bin_conn = BinCompressed()
 isl_lookup = Bin()
 
+ocr_junk = ['<unk>', 'alt;', 'quot;', 'aguot;', '139;', 'a39;', '& 39;']
+
+# dawg = None
+# with open ('../bin.dawg', 'rb') as p:
+#     dawg = pickle.load(p)
+
+
 def get_most_similar_from_list(token, similar_tokens):
     """
     Gets the token with the least Levenshtein distance from a given token
     """
-    most_similar = ['', 100]
-    most_similar = []
+    # most_similar = ['', 100]
+    # most_similar = []
     least_distance = 100
     tok_and_dist = [(str(tok), distance(token, str(tok))) for tok in similar_tokens]
     min_dist = min(dist for tok, dist in tok_and_dist)
@@ -52,21 +58,28 @@ def n_good_words(line):
 def fix_guillemets(line):
     return line.replace('» ', ' »').replace(' «', '« ').strip()
 
-def format_line_out(line):
+def format_line_out(line, junk_list):
     line_out = line
-    to_remove = ['<unk>', 'alt;', 'quot;', 'aguot;', '139;', 'a39;']
-    for junk in to_remove:
+    for junk in junk_list:
         tmp_line_out = line_out.replace(junk, '')
         line_out = tmp_line_out
     return line_out.strip()
 
+
+def get_clean_tokens(lines):
+    junk = ocr_junk + ['-<newline> ']
+    for line in lines:
+        line = format_line_out(line, junk_list=junk)
+        print(line)
+
+
 def get_best_first_half_of_compound_line(line1, line2, line3):
-    line_1_1 = line1.split('<newline>')[0].strip()
+    # line_1_1 = line1.split('<newline>')[0].strip()
     line_1_2 = line1.split('<newline>')[1].strip()
     line_2_1 = line2.split('<newline>')[0].strip()
     line_2_2 = line2.split('<newline>')[1].strip()
     line_3_1 = line3.split('<newline>')[0].strip()
-    line_3_2 = line3.split('<newline>')[1].strip()
+    # line_3_2 = line3.split('<newline>')[1].strip()
     last_token_in_line_1_2 = {'1_2': clean_token(line_1_2.split()[-1])}
     last_token_in_line_2_1 = {'2_1': clean_token(line_2_1.split()[-1])}
     first_token_in_line_2_2 = {'2_2': clean_token(line_2_2.split()[0])}
@@ -117,31 +130,35 @@ def get_best_second_half_of_compound_line(line1, line2, line3):
     return cands
 
 
-def check_token(token):
-    token = clean_token(token)
-    if exists_in_bin(token):
-        return True
-    if makes_sense(token):
-        return True
-    else:
-        lev_dist = 3 if len(token) > 7 else 1
-        similar_cands = dawg.search_within_distance(token, dist=lev_dist)
-        if len(similar_cands) == 1:
-            return similar_cands[0]
-        else:
-            return get_most_similar_from_list(token, similar_cands)
+# def check_token(token, part_of_compound=False):
+#     if part_of_compound:
+#         return True
+
+#     token = clean_token(token)
+#     if exists_in_bin(token):
+#         return True
+#     if makes_sense(token):
+#         return True
+#     else:
+#         lev_dist = 3 if len(token) > 7 else 1
+#         similar_cands = dawg.search_within_distance(token, dist=lev_dist)
+#         if len(similar_cands) == 1:
+#             return similar_cands[0]
+#         else:
+#             most_similar = get_most_similar_from_list(token, similar_cands)
+#             known_subs = get_similar_by_known_subs(token, most_similar)
+#             return known_subs
 
 # TODO: BÚA TIL LISTA SEM HELDUR UTAN UM ALLAR ORÐMYNDIR Í TEXTANUM
 # ÞVÍ ÞAÐ ER MJÖG LÍKLEGT AÐ SAMA ORÐIÐ KOMI OFTAR FYRIR Í HONUM EN
 # EINU SINNI
 
-x = ['maður', 'kona', 'hudnur', 'kosninpúrslifin']
+# x = ['maður', 'kona', 'hudnur', 'kosninpúrslifin']
 
-for token in x:
-    print(token)
-    print(check_token(token))
+# for token in x:
+#     print(token)
+#     print(check_token(token))
 
-quit()
 
 def process_lines(lines):
             """
@@ -233,7 +250,7 @@ def process_lines(lines):
 
 
                 if current_line_out is not None and not ((current_index + 1) == n_lines and current_line_out == ''):
-                    yield format_line_out(current_line_out)
+                    yield format_line_out(current_line_out, ocr_junk)
                 current_index += 1
 
 
@@ -241,11 +258,13 @@ if __name__ == '__main__':
     out_dir = '../test_data/outputs/'
     #test_file = f'{out_dir}less_errors_line_pairs_937152_256_4_1024_16_6_6_0dot1_40_0_3e-05_3000_3_EPOCH_36_althydubladid_1949-2-1-bls-4.txt'
     #test_file = f'{out_dir}less_errors_line_pairs_937152_256_4_1024_16_6_6_0dot1_40_0_3e-05_3000_3_EPOCH_36_ulfur.txt'
-    test_file = f'{out_dir}less_errors_line_pairs_937152_256_2_1024_16_4_4_0dot1_40_0_3e-05_3000_3_EPOCH_6_althydubladid_1949-2-1-bls-4.txt'
+    #test_file = f'{out_dir}less_errors_line_pairs_937152_256_2_1024_16_4_4_0dot1_40_0_3e-05_3000_3_EPOCH_6_althydubladid_1949-2-1-bls-4.txt'
     #test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_20_0_3e-05_3000_3_EPOCH_8_ulfur.txt'
-    #test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_20_0_3e-05_3000_3_EPOCH_8_althydubladid_1949-2-1-bls-4.txt'
+    test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_20_0_3e-05_3000_3_EPOCH_8_althydubladid_1949-2-1-bls-4.txt'
+    get_clean_tokens(read_lines(test_file))
     #test_file = f'{out_dir}less_errors_line_pairs_937152_256_2_1024_16_4_4_0dot1_40_0_3e-05_3000_3_EPOCH_22_althydubladid_1949-2-1-bls-4.txt'
+    all_tokens = [clean_token(token) for token in (list(chain(*[tok for tok in [line.split(' ') for line in read_lines(test_file)]])))]
     for line in process_lines(read_lines(test_file)):
-        print(line)
+        # print(line)
         #print(count_sensemaking_words(current_line_out))
         pass
