@@ -7,6 +7,11 @@ from Levenshtein import distance
 from substitution_token import get_similar_by_known_subs
 from itertools import chain
 import re
+#from pybktree import BKTree
+
+with open('../bin_tree.pickle', 'rb') as bt:
+    tree = pickle.load(bt)
+
 
 punctuation += "–„”—«»"
 
@@ -14,10 +19,6 @@ bin_conn = BinCompressed()
 isl_lookup = Bin()
 
 ocr_junk = ['<unk>', 'alt;', 'quot;', 'aguot;', '139;', 'a39;', '& 39;']
-
-# dawg = None
-# with open ('../bin.dawg', 'rb') as p:
-#     dawg = pickle.load(p)
 
 
 def get_most_similar_from_list(token, similar_tokens):
@@ -67,7 +68,7 @@ def format_line_out(line, junk_list):
 
 
 def get_clean_tokens(lines):
-    junk = ocr_junk + ['-<newline> ']
+    junk = ocr_junk + ['-<newline> ', '<newline']
     for line in lines:
         line = format_line_out(line, junk_list=junk)
         print(line)
@@ -129,36 +130,46 @@ def get_best_second_half_of_compound_line(line1, line2, line3):
             cands = compound_makes_sense[0]
     return cands
 
+def lookup_similar(token):
+    lev_dist = 3 if len(token) > 12 else 1
+    similar_cands = [tok for dist, tok in tree.find(token, n=lev_dist)]
+    if len(similar_cands) == 1:
+        return similar_cands[0]
+    else:
+        if similar_cands:
+            most_similar = [token for token, dist in get_most_similar_from_list(token, similar_cands)]
+            known_subs = get_similar_by_known_subs(token, most_similar)
+            print(known_subs)
+            if len(known_subs) > 1:
+                return None
+            else:
+                return known_subs
+        else:
+            return None
 
-# def check_token(token, part_of_compound=False):
-#     if part_of_compound:
-#         return True
+def check_token(token, part_of_compound=False):
+    if part_of_compound:
+        return True
 
-#     token = clean_token(token)
-#     if exists_in_bin(token):
-#         return True
-#     if makes_sense(token):
-#         return True
-#     else:
-#         lev_dist = 3 if len(token) > 7 else 1
-#         similar_cands = dawg.search_within_distance(token, dist=lev_dist)
-#         if len(similar_cands) == 1:
-#             return similar_cands[0]
-#         else:
-#             most_similar = get_most_similar_from_list(token, similar_cands)
-#             known_subs = get_similar_by_known_subs(token, most_similar)
-#             return known_subs
+    token = clean_token(token)
+    if exists_in_bin(token):
+        return True
+    if makes_sense(token):
+        return True
+    else:
+        return lookup_similar(token)
 
 # TODO: BÚA TIL LISTA SEM HELDUR UTAN UM ALLAR ORÐMYNDIR Í TEXTANUM
 # ÞVÍ ÞAÐ ER MJÖG LÍKLEGT AÐ SAMA ORÐIÐ KOMI OFTAR FYRIR Í HONUM EN
 # EINU SINNI
 
-# x = ['maður', 'kona', 'hudnur', 'kosninpúrslifin']
+x = ['maður', 'kona', 'hudnur', 'kosninpúrslifin']
 
 # for token in x:
-#     print(token)
+#     #print(token)
 #     print(check_token(token))
 
+# quit()
 
 def process_lines(lines):
             """
@@ -215,7 +226,7 @@ def process_lines(lines):
                 except IndexError:
                     pass
 
-                # This is only for the fist line. Special case because of my indexing. Not ideal, I know.
+                # This is only for the fist line. Special case because of the indexing. Not ideal, I know.
                 if current_index == 0:
                     yield curr_first_half
 
@@ -260,11 +271,13 @@ if __name__ == '__main__':
     #test_file = f'{out_dir}less_errors_line_pairs_937152_256_4_1024_16_6_6_0dot1_40_0_3e-05_3000_3_EPOCH_36_ulfur.txt'
     #test_file = f'{out_dir}less_errors_line_pairs_937152_256_2_1024_16_4_4_0dot1_40_0_3e-05_3000_3_EPOCH_6_althydubladid_1949-2-1-bls-4.txt'
     #test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_20_0_3e-05_3000_3_EPOCH_8_ulfur.txt'
-    test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_20_0_3e-05_3000_3_EPOCH_8_althydubladid_1949-2-1-bls-4.txt'
-    get_clean_tokens(read_lines(test_file))
+    #test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_20_0_3e-05_3000_3_EPOCH_8_althydubladid_1949-2-1-bls-4.txt'
+    #test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_40_0_2e-05_3000_3_EPOCH_9_althydubladid_1949-2-1-bls-4.txt'
+    #test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_40_0_2e-05_3000_3_EPOCH_9_ulfur.txt'
+    test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_40_0_2e-05_3000_3_EPOCH_11_althydubladid_1949-2-1-bls-4.txt'
+    #get_clean_tokens(read_lines(test_file))
     #test_file = f'{out_dir}less_errors_line_pairs_937152_256_2_1024_16_4_4_0dot1_40_0_3e-05_3000_3_EPOCH_22_althydubladid_1949-2-1-bls-4.txt'
-    all_tokens = [clean_token(token) for token in (list(chain(*[tok for tok in [line.split(' ') for line in read_lines(test_file)]])))]
+    #all_tokens = [clean_token(token) for token in (list(chain(*[tok for tok in [line.split(' ') for line in read_lines(test_file)]])))]
     for line in process_lines(read_lines(test_file)):
-        # print(line)
-        #print(count_sensemaking_words(current_line_out))
+        print(line)
         pass
