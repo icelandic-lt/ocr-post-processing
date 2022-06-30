@@ -20,7 +20,7 @@ stöðnu bæjar- og sveitarstjórna <newline> kosningum hafi verið komm-
 kosningum hafi verið komm-<newline> únistar og íhaldsmenn. Ræðir
 únistar og íhaldsmenn. Ræðir <newline> hann í þessu sambandi einvörð
 hann í þessu sambandi einvörð <newline> ungu kosningaúrslitin í Reykja
-ungu kosningaúrslitin í Reykjavík, þar sem íhaldið bar sigur
+ungu kosningaúrslitin í Reykja <newline> vík, þar sem íhaldið bar sigur
 vík, þar sem íhaldið bar sigur <newline> af hólmi og fékk völd sín fram-
 af hólmi og fékk völd sín fram-<newline> lengd einu sinni enn, og á
 lengd einu sinni enn, og á <newline> Norðfirði, en þar áttu komm-
@@ -374,7 +374,7 @@ gestum. Var frekja þeirra og svo <newline> mikil að kjósendur urðu að
 mikil að kjósendur urðu að <newline> hrista þá af sér. Stjórnmál-
 hrista þá af sér. Stjórnmál-<newline> flokkarnir hljóta og að sjá það
 flokkarnir hljóta og að sjá það <newline> sjálfir, að þetta hefur engin á-
-sjálfir, að þetta hefur engin áhrif á úrslitin. Það er fásinna
+sjálfir, að þetta hefur engin á- <newline> hrif á úrslitin. Það er fásinna
 hrif á úrslitin. Það er fásinna <newline> að ætla að axlaskúfaprýddir
 að ætla að axlaskúfaprýddir <newline> stráklingar snúi kjósenda á kjör
 stráklingar snúi kjósenda á kjör <newline> stað.

@@ -39,7 +39,8 @@ def evaluate(original_file, corrected_file, transformed_file):
         'Original/Corrected CHRF:': orig_corr_chrf,
         'Original/Transformed CHRF:': orig_trns_chrf,
         'Corrected/Transformed CHRF:': corr_trns_chrf,
-        'Improvement:': corr_trns_chrf - orig_corr_chrf
+        'Improvement:': corr_trns_chrf - orig_corr_chrf,
+        'Prop improv:': (corr_trns_chrf - orig_corr_chrf)/(1 - orig_corr_chrf)
     }
     return scores
 
