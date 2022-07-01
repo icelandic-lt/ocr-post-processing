@@ -2,15 +2,18 @@ from islenska.bincompress import BinCompressed
 from islenska import Bin
 from string import punctuation
 import pickle
-# from lexpy.dawg import DAWG
 from Levenshtein import distance
 from substitution_token import get_similar_by_known_subs
 from itertools import chain
 import re
-#from pybktree import BKTree
+from argparse import ArgumentParser
 
-with open('../bin_tree.pickle', 'rb') as bt:
-    tree = pickle.load(bt)
+parser = ArgumentParser()
+parser.add_argument('-f', '--file')
+args = parser.parse_args()
+
+# with open('../bin_tree.pickle', 'rb') as bt:
+#     tree = pickle.load(bt)
 
 
 punctuation += "–„”—«»"
@@ -25,8 +28,6 @@ def get_most_similar_from_list(token, similar_tokens):
     """
     Gets the token with the least Levenshtein distance from a given token
     """
-    # most_similar = ['', 100]
-    # most_similar = []
     least_distance = 100
     tok_and_dist = [(str(tok), distance(token, str(tok))) for tok in similar_tokens]
     min_dist = min(dist for tok, dist in tok_and_dist)
@@ -75,31 +76,34 @@ def get_clean_tokens(lines):
 
 
 def get_best_first_half_of_compound_line(line1, line2, line3):
-    # line_1_1 = line1.split('<newline>')[0].strip()
-    line_1_2 = line1.split('<newline>')[1].strip()
-    line_2_1 = line2.split('<newline>')[0].strip()
-    line_2_2 = line2.split('<newline>')[1].strip()
-    line_3_1 = line3.split('<newline>')[0].strip()
-    # line_3_2 = line3.split('<newline>')[1].strip()
-    last_token_in_line_1_2 = {'1_2': clean_token(line_1_2.split()[-1])}
-    last_token_in_line_2_1 = {'2_1': clean_token(line_2_1.split()[-1])}
-    first_token_in_line_2_2 = {'2_2': clean_token(line_2_2.split()[0])}
-    first_token_in_line_3_1 = {'3_1': clean_token(line_3_1.split()[0])}
-    cand_1 = [line_1_2, last_token_in_line_1_2.get('1_2') + first_token_in_line_2_2.get('2_2')]
-    cand_2 = [line_1_2, last_token_in_line_1_2.get('1_2') + first_token_in_line_3_1.get('3_1')]
-    cand_3 = [line_2_1, last_token_in_line_2_1.get('2_1') + first_token_in_line_2_2.get('2_2')]
-    cand_4 = [line_2_1, last_token_in_line_2_1.get('2_1') + first_token_in_line_3_1.get('3_1')]
+    try:
+        # line_1_1 = line1.split('<newline>')[0].strip()
+        line_1_2 = line1.split('<newline>')[1].strip()
+        line_2_1 = line2.split('<newline>')[0].strip()
+        line_2_2 = line2.split('<newline>')[1].strip()
+        line_3_1 = line3.split('<newline>')[0].strip()
+        # line_3_2 = line3.split('<newline>')[1].strip()
+        last_token_in_line_1_2 = {'1_2': clean_token(line_1_2.split()[-1])}
+        last_token_in_line_2_1 = {'2_1': clean_token(line_2_1.split()[-1])}
+        first_token_in_line_2_2 = {'2_2': clean_token(line_2_2.split()[0])}
+        first_token_in_line_3_1 = {'3_1': clean_token(line_3_1.split()[0])}
+        cand_1 = [line_1_2, last_token_in_line_1_2.get('1_2') + first_token_in_line_2_2.get('2_2')]
+        cand_2 = [line_1_2, last_token_in_line_1_2.get('1_2') + first_token_in_line_3_1.get('3_1')]
+        cand_3 = [line_2_1, last_token_in_line_2_1.get('2_1') + first_token_in_line_2_2.get('2_2')]
+        cand_4 = [line_2_1, last_token_in_line_2_1.get('2_1') + first_token_in_line_3_1.get('3_1')]
 
-    cands = None
+        cands = None
 
-    compound_in_bin = [fh[0] for fh in [cand_1, cand_2, cand_3, cand_4] if exists_in_bin(fh[1])]
-    if compound_in_bin:
-        cands = compound_in_bin[0]
-    else:
-        compound_makes_sense = [fh[0] for fh in [cand_1, cand_2, cand_3, cand_4] if makes_sense(fh[1])]
-        if compound_makes_sense:
-            cands = compound_makes_sense[0]
-    return cands
+        compound_in_bin = [fh[0] for fh in [cand_1, cand_2, cand_3, cand_4] if exists_in_bin(fh[1])]
+        if compound_in_bin:
+            cands = compound_in_bin[0]
+        else:
+            compound_makes_sense = [fh[0] for fh in [cand_1, cand_2, cand_3, cand_4] if makes_sense(fh[1])]
+            if compound_makes_sense:
+                cands = compound_makes_sense[0]
+        return cands
+    except IndexError:
+        return line1
 
 
 def get_best_second_half_of_compound_line(line1, line2, line3):
@@ -267,15 +271,7 @@ def process_lines(lines):
 
 if __name__ == '__main__':
     out_dir = '../test_data/outputs/'
-    #test_file = f'{out_dir}less_errors_line_pairs_937152_256_4_1024_16_6_6_0dot1_40_0_3e-05_3000_3_EPOCH_36_althydubladid_1949-2-1-bls-4.txt'
-    #test_file = f'{out_dir}less_errors_line_pairs_937152_256_4_1024_16_6_6_0dot1_40_0_3e-05_3000_3_EPOCH_36_ulfur.txt'
-    #test_file = f'{out_dir}less_errors_line_pairs_937152_256_2_1024_16_4_4_0dot1_40_0_3e-05_3000_3_EPOCH_6_althydubladid_1949-2-1-bls-4.txt'
-    #test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_20_0_3e-05_3000_3_EPOCH_8_ulfur.txt'
-    #test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_20_0_3e-05_3000_3_EPOCH_8_althydubladid_1949-2-1-bls-4.txt'
-    #test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_40_0_2e-05_3000_3_EPOCH_9_althydubladid_1949-2-1-bls-4.txt'
-    #test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_40_0_2e-05_3000_3_EPOCH_9_ulfur.txt'
-    #test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_40_0_2e-05_3000_3_EPOCH_11_althydubladid_1949-2-1-bls-4.txt'
-    test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_24_5_5_0dot1_40_0_3e-05_3000_3_EPOCH_12_althydubladid_1949-2-1-bls-4.txt'
+    test_file = args.file
     #get_clean_tokens(read_lines(test_file))
     #test_file = f'{out_dir}less_errors_line_pairs_937152_256_2_1024_16_4_4_0dot1_40_0_3e-05_3000_3_EPOCH_22_althydubladid_1949-2-1-bls-4.txt'
     #all_tokens = [clean_token(token) for token in (list(chain(*[tok for tok in [line.split(' ') for line in read_lines(test_file)]])))]
