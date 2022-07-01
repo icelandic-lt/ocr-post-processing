@@ -274,7 +274,8 @@ if __name__ == '__main__':
     #test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_20_0_3e-05_3000_3_EPOCH_8_althydubladid_1949-2-1-bls-4.txt'
     #test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_40_0_2e-05_3000_3_EPOCH_9_althydubladid_1949-2-1-bls-4.txt'
     #test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_40_0_2e-05_3000_3_EPOCH_9_ulfur.txt'
-    test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_40_0_2e-05_3000_3_EPOCH_11_althydubladid_1949-2-1-bls-4.txt'
+    #test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_16_6_6_0dot1_40_0_2e-05_3000_3_EPOCH_11_althydubladid_1949-2-1-bls-4.txt'
+    test_file = f'{out_dir}less_errors_line_pairs_937152_512_4_2048_24_5_5_0dot1_40_0_3e-05_3000_3_EPOCH_12_althydubladid_1949-2-1-bls-4.txt'
     #get_clean_tokens(read_lines(test_file))
     #test_file = f'{out_dir}less_errors_line_pairs_937152_256_2_1024_16_4_4_0dot1_40_0_3e-05_3000_3_EPOCH_22_althydubladid_1949-2-1-bls-4.txt'
     #all_tokens = [clean_token(token) for token in (list(chain(*[tok for tok in [line.split(' ') for line in read_lines(test_file)]])))]
