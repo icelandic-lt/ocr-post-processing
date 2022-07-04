@@ -40,3 +40,4 @@ Epoch: 37, Train loss: 0.031, Val loss: 0.041, Epoch time = 3153.741s (27/6 0:38
 Epoch: 38, Train loss: 0.030, Val loss: 0.041, Epoch time = 3150.401s (27/6 1:34)
 Epoch: 39, Train loss: 0.030, Val loss: 0.041, Epoch time = 3152.736s (27/6 2:30)
 Epoch: 40, Train loss: 0.030, Val loss: 0.041, Epoch time = 3153.695s (27/6 3:26)
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
