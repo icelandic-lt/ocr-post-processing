@@ -8,7 +8,8 @@ from globals import (read_files,
                      ORIGINAL_FILES,
                      CORRECTED_FILES,
                      ORIGINAL_VAL_FILES,
-                     CORRECTED_VAL_FILES)
+                     CORRECTED_VAL_FILES,
+                     TOKENIZER_INFO)
 
 
 parser = argparse.ArgumentParser()
@@ -31,17 +32,17 @@ if __name__ == '__main__':
         training_data = pandas.DataFrame()
         training_data['original'] = list(read_files(ORIGINAL_FILES, tokenizer=tokenize))
         training_data['corrected'] = list(read_files(CORRECTED_FILES, tokenizer=tokenize))
-        training_data.to_pickle('dataframes/training_data.pickle')
+        training_data.to_pickle(f'dataframes/training_data_{TOKENIZER_INFO}.pickle')
 
         print('> Building validation dataframe')
         validation_data = pandas.DataFrame()
         validation_data['original'] = list(read_files(ORIGINAL_VAL_FILES, tokenizer=tokenize))
         validation_data['corrected'] = list(read_files(CORRECTED_VAL_FILES, tokenizer=tokenize))
 
-        validation_data.to_pickle('dataframes/validation_data.pickle')
+        validation_data.to_pickle(f'dataframes/validation_data_{TOKENIZER_INFO}.pickle')
 
     elif args.type == 'errors':
-        correct_words = create_correct_word_list('data/parallel/50k_gold/corrected/')
+        correct_words = create_correct_word_list(f'data/parallel/50k_gold/corrected/')
         print('> Setting up files...')
         write_replacements_to_single_file('data/errors/all_replacements.tsv',
                                           correct_word_list=correct_words,

@@ -5,10 +5,10 @@ from transformers import BertTokenizer
 from pathlib import Path
 
 calling_module = Path(modules['__main__'].__file__).stem
-
+TOKENIZER_INFO = '2000_3'
 TEST_RUN = False
 
-TOKENIZER = 'ocr_tokenizers/2000_3/'
+TOKENIZER = f'ocr_tokenizers/{TOKENIZER_INFO}/'
 
 if TEST_RUN:
     ORIGINAL_FILES = 'data/toy_corpus/training/original'
@@ -25,8 +25,8 @@ else:
 
 # These files don't exist when setup.py is run.
 if calling_module != 'setup':
-    TRAINING_DATA = pandas.read_pickle('dataframes/training_data.pickle')
-    VALIDATION_DATA = pandas.read_pickle('dataframes/validation_data.pickle')
+    TRAINING_DATA = pandas.read_pickle(f'dataframes/training_data_{TOKENIZER_INFO}.pickle')
+    VALIDATION_DATA = pandas.read_pickle(f'dataframes/validation_data_{TOKENIZER_INFO}.pickle')
 
 def get_vocab(vocab_file):
     with open(vocab_file, 'r') as vocab:

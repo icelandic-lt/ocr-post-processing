@@ -1,3 +1,4 @@
+
 from islenska.bincompress import BinCompressed
 from islenska import Bin
 from string import punctuation
@@ -12,8 +13,7 @@ parser = ArgumentParser()
 parser.add_argument('-f', '--file')
 args = parser.parse_args()
 
-# with open('../bin_tree.pickle', 'rb') as bt:
-#     tree = pickle.load(bt)
+
 
 
 punctuation += "–„”—«»"
@@ -167,7 +167,11 @@ def check_token(token, part_of_compound=False):
 # ÞVÍ ÞAÐ ER MJÖG LÍKLEGT AÐ SAMA ORÐIÐ KOMI OFTAR FYRIR Í HONUM EN
 # EINU SINNI
 
-x = ['maður', 'kona', 'hudnur', 'kosninpúrslifin']
+
+# with open('../bin_tree.pickle', 'rb') as bt:
+#     tree = pickle.load(bt)
+
+# x = ['maður', 'kona', 'hudnur', 'kosninpúrslifin']
 
 # for token in x:
 #     #print(token)
@@ -178,11 +182,9 @@ x = ['maður', 'kona', 'hudnur', 'kosninpúrslifin']
 def process_lines(lines):
             """
             Iterate over all the lines in a file. The format is as such:
-
             First part of a sentence <newline> which continues here
             which continues here <newline> and ends here.
             and ends here. <newline> The next sentence
-
             The model is trained on data like this, because its input (during
             the inference phase) is very often split between lines, and the
             transformer's attention mechanism only works on running sequences.
@@ -238,14 +240,14 @@ def process_lines(lines):
                     # The two candidates will most of the time be the same.
                     if curr_secnd_half == next_first_half:
                         current_line_out = curr_secnd_half
-                    else:
-                        if curr_secnd_half:
-                            if curr_secnd_half.endswith('-'):
-                                best_comp_first_half = get_best_first_half_of_compound_line(lines[current_index],
-                                                                                            lines[current_index+1],
-                                                                                            lines[current_index+2])
-                                if best_comp_first_half:
-                                    current_line_out = best_comp_first_half
+                    # else:
+                    #     if curr_secnd_half:
+                    #         if curr_secnd_half.endswith('-'):
+                    #             best_comp_first_half = get_best_first_half_of_compound_line(lines[current_index],
+                    #                                                                         lines[current_index+1],
+                    #                                                                         lines[current_index+2])
+                    #             if best_comp_first_half:
+                    #                 current_line_out = best_comp_first_half
                             # else:
                             #     n_good_curr = n_good_words(curr_secnd_half)
                             #     n_good_next = n_good_words(next_first_half)
@@ -260,8 +262,8 @@ def process_lines(lines):
                         #         if best_comp_second_half:
                         #             current_line_out = best_comp_second_half
 
-                        else:
-                            current_line_out = next_first_half
+                        # else:
+                        #     current_line_out = next_first_half
 
 
                 if current_line_out is not None and not ((current_index + 1) == n_lines and current_line_out == ''):
