@@ -1,6 +1,0 @@
-ALÞÝÐUBLAÐIÐ <newline> Miðvikudagur 1. febrúar 1849
-Miðvikudagur 1. febrúar 1849 <newline> Úlgefandi: Alþýðuflokkurinn.
-Úlgefandi: AlþýSuflokkurinn. <newline> Ritstjóri: Stefán Pjetursson.
-Ritstjóri: Stefán Pjetursson. <newline> Fréttastjóri: Benedikt Gröndal.
-Fréttastjóri: Benedikt Gröndal. <newline> Þingfréttir: Helgi Sæmundsson.
-Þingfréttir: Helgi Sæmundsson. <newline> Ritstjórnarsímar: 4091, 4902.
