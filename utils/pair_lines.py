@@ -1,73 +1,44 @@
-
-from genericpath import exists
-from islenska.bincompress import BinCompressed
-from islenska import Bin
-from string import punctuation
 import pickle
 from Levenshtein import distance
-from substitution_token import get_similar_by_known_subs
-from general_token import TextToken, OCRToken
-from itertools import chain
-import re
+from tokens import OCRToken
 from argparse import ArgumentParser
+from lookup import (get_similar_by_known_subs, 
+                    exists_in_old_words, 
+                    get_most_similar_from_list, 
+                    makes_sense, exists_in_bin, 
+                    n_good_words, 
+                    exists_in_bin_or_old_words,
+                    old_tree,
+                    bin_tree,
+                    lookup_similar,
+                    spelling_modernized)
+from format import (clean_token, 
+                    format_line_out, 
+                    format_token_out, 
+                    is_editable)
 
 parser = ArgumentParser()
 parser.add_argument('-f', '--file')
 args = parser.parse_args()
 
-with open('../bin_tree.pickle', 'rb') as bt:
-    tree = pickle.load(bt)
 
-
-punctuation += "–„”—«»"
-
-bin_conn = BinCompressed()
-isl_lookup = Bin()
 
 ocr_junk = ['<unk>', 'alt;', 'quot;', 'aguot;', '139;', 'a39;', '& 39;']
 
 
-def get_most_similar_from_list(token, similar_tokens):
-    """
-    Gets the token with the least Levenshtein distance from a given token
-    """
-    least_distance = 100
-    tok_and_dist = [(str(tok), distance(token, str(tok))) for tok in similar_tokens]
-    min_dist = min(dist for tok, dist in tok_and_dist)
-    possible_similar = [(tok, dist) for tok, dist in tok_and_dist if dist <= (min_dist+1)]
-    return possible_similar
-
-def makes_sense(token):
-    return isl_lookup.lookup(token)[1] != []
-
-def exists_in_bin(token):
-    return bin_conn.lookup(token) != []
 
 
 def read_lines(file):
     with open(file, 'r', encoding='utf-8') as infile:
         return infile.read().splitlines()
 
-def clean_token(token):
-    return token.strip(punctuation)
 
-def n_good_words(line):
-    sensemaking_words = [word for word in line.split() if makes_sense(clean_token(word))]
-    return (len(sensemaking_words))
-
-
-def format_line_out(line, junk_list):
-    line_out = line
-    for junk in junk_list:
-        tmp_line_out = line_out.replace(junk, '')
-        line_out = tmp_line_out
-    return line_out.strip()
-
-
-def any_exists_in_bin(token):
-    return exists_in_bin(token) or exists_in_bin(token.lower()) or exists_in_bin(token.title())
 
 def get_best_first_half_of_compound_line(line1, line2, line3):
+    """
+    Returns a line ending with a hyphen whose last token can be combined
+    with following line's first token.
+    """
     try:
         # line_1_1 = line1.split('<newline>')[0].strip()
         line_1_2 = line1.split('<newline>')[1].strip()
@@ -99,6 +70,10 @@ def get_best_first_half_of_compound_line(line1, line2, line3):
 
 
 def get_best_second_half_of_compound_line(line1, line2, line3):
+    """
+    Return a line whose first token can be combined with the preceding line's
+    last token, given that the preceding line ends with a hyphen.
+    """
     try:
         line_1_1 = line1.split('<newline>')[0].strip()
         line_minus_1_1 = line2.split('<newline>')[0].strip()
@@ -129,76 +104,59 @@ def get_best_second_half_of_compound_line(line1, line2, line3):
     except IndexError:
         return line_1_1
 
-def lookup_similar(token):
-    lev_dist = 3 if len(token) > 12 else 1
-    similar_cands = [tok for dist, tok in tree.find(token, n=lev_dist)]
-    if len(similar_cands) == 0:
-        similar_cands = [tok for dist, tok in tree.find(token.lower(), n=lev_dist)]
-    if len(similar_cands) == 1:
-        return similar_cands[0]
-    else:
-        if similar_cands:      
-            most_similar = [token for token, dist in get_most_similar_from_list(token, similar_cands)]
-            known_subs = get_similar_by_known_subs(token, most_similar)
-            if len(known_subs) > 1:
-                filtered_subs = min(get_most_similar_from_list(token, known_subs), key=lambda x: x[1])
-                if filtered_subs:
-                    return filtered_subs[0]
-                return None
-            else:
-                if known_subs:
-                    return known_subs[0]
-                else:
-                    return None
-        else:
-            return None
-
-
-def format_token_out(token, start_punct, end_punct):
-    tok_and_punct = ''
-    if start_punct:
-        tok_and_punct += start_punct
-    tok_and_punct += token
-    if end_punct:
-        tok_and_punct += end_punct
-    return tok_and_punct + ' '
-
-
-def editable(token, index):
-    return (len(token) > 3
-            and not (index != 0 and len(token) < 4)
-            and not token.endswith('-') 
-            and not token.endswith('.'))
-
 
 
 def sub_tokens_in_line(line):
+    """
+    Substitute tokens that are most likely erroneous and have a
+    similar candidate in BÍN to which the Levenshtein distance
+    is short.
+    """
     line_out = ''
+    line = ' '.join(line.split('—'))
     for (index, token) in enumerate(line.split()):
         token_out = token
+        # Declare variables to keep track of the punctuation surrounding the token
+        # A proper tokenizer doesn't work on OCRed files, because of the text's 
+        # unpredictability.
         start_punct = None
         end_punct = None
         ocr_token = OCRToken(token)
+        
+        # Assign the punctuation to variables
         if not ocr_token.is_punct:
             if ocr_token.startswith_punct:
-                start_punct = ocr_token.original_token[ocr_token.start_punct_index[0]:len(ocr_token.start_punct_index)]
+                start_punct = ocr_token.start_punct
             if ocr_token.endswith_punct:
-                end_punct = ocr_token.original_token[ocr_token.end_punct_index[0]:len(ocr_token)]
-        if any_exists_in_bin(ocr_token.clean) or not editable(token, index):
+                end_punct = ocr_token.end_punct
+
+        # If the token exists in BÍN or OLD_WORDS or shouldn't be edited (see is_editable) it is simply returned as is
+        if exists_in_bin_or_old_words(ocr_token.clean) or not is_editable(token, index) or ocr_token.is_punct:
             token_out = ocr_token.clean
+        
+        # If the token does not exist in BÍN or OLD_WORDS or should be edited (see is_editable), look for a similar
+        # token, whose edit operations against the current token are known and appear more than 10 times.
         else:
-            similar_token = lookup_similar(ocr_token.clean)
+            similar_token = lookup_similar(ocr_token.clean, error_frequency=10)
             if similar_token:
-                token_out = str(similar_token)
+                if spelling_modernized(ocr_token.clean, str(similar_token)):
+                    token_out = ocr_token.clean
+                else:
+                    token_out = str(similar_token)
             else:
-                token_out = ocr_token.clean
+                token_out = ocr_token
+        
+        # Restore the capitalization of token_out (inferred from the original token)
         if token.islower():
-            token_out = token_out.lower()
+            token_out = str(token_out).lower()
         elif token.isupper():
-            token_out = token_out.upper()
+            token_out = str(token_out).upper()
         elif token.istitle():
-            token_out = token_out.title()
-        line_out += format_token_out(token_out, start_punct=start_punct, end_punct=end_punct)
+            token_out = str(token_out).title()
+        if token_out == token:
+            line_out += format_token_out(str(token_out), start_punct=None, end_punct=None)
+        else:
+            line_out += format_token_out(str(token_out), start_punct=start_punct, end_punct=end_punct)
     return line_out.strip()
 
 
@@ -221,7 +179,6 @@ def process_lines(lines):
 
                 line_is_split = len(lines[current_index].split('<newline>')) > 1
                 curr_first_half = lines[current_index].split('<newline>')[0].strip()
-
 
 
                 curr_secnd_half = None
@@ -256,7 +213,7 @@ def process_lines(lines):
                     last_last_secnd_half = last_last_line.split('<newline>')[1].strip()
                 except IndexError:
                     pass
-                # This is only for the fist line. Special case because of the indexing. Not ideal, I know.
+                # This is only for the fist line. Special case because of the indexing.
                 if current_index == 0:
                     yield curr_first_half
 
@@ -272,11 +229,11 @@ def process_lines(lines):
                                                                                             lines[current_index+2])
                                 if best_comp_first_half:
                                     current_line_out = best_comp_first_half
-                            # else:
-                            #     n_good_curr = n_good_words(curr_secnd_half)
-                            #     n_good_next = n_good_words(next_first_half)
-                            #     if n_good_curr > n_good_next:
-                            #         current_line_out = curr_secnd_half
+                            else:
+                                n_good_curr = n_good_words(curr_secnd_half)
+                                n_good_next = n_good_words(next_first_half)
+                                if n_good_curr > n_good_next:
+                                    current_line_out = curr_secnd_half
 
                         # if all([last_first_half, last_last_secnd_half]):
                         #     if all([last_first_half.endswith('-'), last_last_secnd_half.endswith('-')]):
@@ -284,24 +241,26 @@ def process_lines(lines):
                         #                                                                       last_line,
                         #                                                                       last_last_line)
                         #         if best_comp_second_half:
-                        #             current_line_out = best_comp_second_half
+                        #             try:
+                        #                 if not last_secnd_half.split()[0] == curr_first_half.split()[0]:
+                        #                     current_line_out = best_comp_second_half
+                        #             except:
+                        #                 pass
 
                         # else:
                         #     current_line_out = next_first_half
 
                 
                 if current_line_out is not None and not ((current_index + 1) == n_lines and current_line_out == ''):
-                    
                     yield format_line_out(current_line_out, ocr_junk)
                 current_index += 1
 
 
 if __name__ == '__main__':
-    out_dir = '../test_data/outputs/'
     test_file = args.file
     for line in process_lines(read_lines(test_file)):
-        print(line)
-        # edited = sub_tokens_in_line(line)
-        # if edited:
-        #     print(edited)
-        # pass
+        #print(line)
+        print(sub_tokens_in_line(line))
+        #if edited:
+        #print(edited)
+        pass

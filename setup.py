@@ -42,12 +42,12 @@ if __name__ == '__main__':
         validation_data.to_pickle(f'dataframes/validation_data_{TOKENIZER_INFO}.pickle')
 
     elif args.type == 'errors':
-        correct_words = create_correct_word_list(f'data/parallel/50k_gold/corrected/')
+        correct_words = create_correct_word_list(f'data/parallel/60k_gold/corrected/')
         print('> Setting up files...')
         write_replacements_to_single_file('data/errors/all_replacements.tsv',
                                           correct_word_list=correct_words,
-                                          ocr_files_path='data/parallel/50k_gold/original',
-                                          corrected_files_path='data/parallel/50k_gold/corrected')
+                                          ocr_files_path='data/parallel/60k_gold/original',
+                                          corrected_files_path='data/parallel/60k_gold/corrected')
         print('> Setting up databases...')
         # This database contains original_string, corrected_string, frequency_of_substitution
         handle_file('dbs/replacements.db')
