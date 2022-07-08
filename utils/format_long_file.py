@@ -30,3 +30,4 @@ for file in all_files:
     print(f'[{counter}/{len(all_files)}]')
     shorter_lines = list(read_lines(file))
     write_lines(file, shorter_lines)
+
