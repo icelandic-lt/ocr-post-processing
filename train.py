@@ -16,7 +16,7 @@ import params
 from ocr_dataset import OCRDataset
 from transformer_classes import Seq2SeqTransformer
 from glob import glob
-
+from tqdm import tqdm
 
 from globals import (ORIGINAL_FILES,
                      CORRECTED_FILES,
@@ -130,7 +130,6 @@ def collate_fn(batch):
 
 VALIDATION_DATALOADER = DataLoader(VALIDATION_DATASET, batch_size=params.BATCH_SIZE, collate_fn=collate_fn)
 
-
 def train_epoch(model, train_optimizer, training_dataset):
     model.train()
     losses = 0
@@ -138,7 +137,7 @@ def train_epoch(model, train_optimizer, training_dataset):
                                   shuffle=True,
                                   batch_size=params.BATCH_SIZE,
                                   collate_fn=collate_fn)
-    for src, tgt in train_dataloader:
+    for src, tgt in tqdm(train_dataloader, leave=False):
         src = src.to(DEVICE)
         tgt = tgt.to(DEVICE)
         tgt_input = tgt[:-1, :]
