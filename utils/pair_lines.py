@@ -195,6 +195,9 @@ def process_lines(lines):
                     current_line_out = curr_secnd_half
                 else:
                     current_Line_out = curr_first_half
+                    
+                
+                
                 if not curr_line_is_last_in_file:
                     next_first_half = lines[current_index+1].split('<newline>')[0].strip()
                     next_line_is_split = len(lines[current_index+1].split('<newline>')) > 1
@@ -260,8 +263,8 @@ def process_lines(lines):
 if __name__ == '__main__':
     test_file = args.file
     for line in process_lines(read_lines(test_file)):
-        #print(line)
-        print(sub_tokens_in_line(line))
+        print(line)
+        #print(sub_tokens_in_line(line))
         #if edited:
         #print(edited)
         pass
