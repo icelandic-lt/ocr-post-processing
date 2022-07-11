@@ -193,7 +193,8 @@ def process_lines(lines):
                     curr_secnd_half = lines[current_index].split('<newline>')[1].strip()
                     # current_line_out set as curr_secnd_half.
                     current_line_out = curr_secnd_half
-
+                else:
+                    current_Line_out = curr_first_half
                 if not curr_line_is_last_in_file:
                     next_first_half = lines[current_index+1].split('<newline>')[0].strip()
                     next_line_is_split = len(lines[current_index+1].split('<newline>')) > 1
