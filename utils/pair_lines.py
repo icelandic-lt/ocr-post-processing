@@ -1,4 +1,5 @@
 import pickle
+from tracemalloc import start
 from Levenshtein import distance
 from tokens import OCRToken
 from argparse import ArgumentParser
@@ -15,7 +16,9 @@ from lookup import (get_similar_by_known_subs,
 from format import (clean_token, 
                     format_line_out, 
                     format_token_out, 
-                    is_editable)
+                    is_editable,
+                    split_keep_delimiter,
+                    extended_punctuation)
 
 parser = ArgumentParser()
 parser.add_argument('-f', '--file')
@@ -113,8 +116,10 @@ def sub_tokens_in_line(line):
     is short.
     """
     line_out = ''
-    line = ' '.join(line.split('—'))
+    #line = ' '.join(line.split('—'))
+    line = ' '.join(split_keep_delimiter(line, '—'))
     for (index, token) in enumerate(line.split()):
+
         token_out = token
         # Declare variables to keep track of the punctuation surrounding the token
         # A proper tokenizer doesn't work on OCRed files, because of the text's 
@@ -122,6 +127,7 @@ def sub_tokens_in_line(line):
         start_punct = None
         end_punct = None
         ocr_token = OCRToken(token)
+
         
         # Assign the punctuation to variables
         if not ocr_token.is_punct:
@@ -129,11 +135,12 @@ def sub_tokens_in_line(line):
                 start_punct = ocr_token.start_punct
             if ocr_token.endswith_punct:
                 end_punct = ocr_token.end_punct
-
         # If the token exists in BÍN or OLD_WORDS or shouldn't be edited (see is_editable) it is simply returned as is
-        if exists_in_bin_or_old_words(ocr_token.clean) or not is_editable(token, index) or ocr_token.is_punct:
-            token_out = ocr_token.clean
-        
+        if exists_in_bin_or_old_words(ocr_token.clean) or not is_editable(token, index, len(line.split())) and not ocr_token.is_punct:
+            if 'Jafnaðarmanns' in token:
+                print(ocr_token, ocr_token.clean)
+                quit()
+            token_out = ocr_token.clean   
         # If the token does not exist in BÍN or OLD_WORDS or should be edited (see is_editable), look for a similar
         # token, whose edit operations against the current token are known and appear more than 10 times.
         else:
@@ -144,19 +151,21 @@ def sub_tokens_in_line(line):
                 else:
                     token_out = str(similar_token)
             else:
-                token_out = ocr_token
-        
+                token_out = str(ocr_token.clean)
         # Restore the capitalization of token_out (inferred from the original token)
         if token.islower():
-            token_out = str(token_out).lower()
+            token_out = token_out.lower()
         elif token.isupper():
-            token_out = str(token_out).upper()
+            token_out = token_out.upper()
         elif token.istitle():
-            token_out = str(token_out).title()
+            token_out = token_out.title()
+        if token in extended_punctuation:
+            token_out = token
         if token_out == token:
-            line_out += format_token_out(str(token_out), start_punct=None, end_punct=None)
+           line_out += format_token_out(token_out, start_punct=None, end_punct=None)
+ 
         else:
-            line_out += format_token_out(str(token_out), start_punct=start_punct, end_punct=end_punct)
+            line_out += format_token_out(token_out, start_punct=start_punct, end_punct=end_punct)
     return line_out.strip()
 
 
@@ -183,6 +192,7 @@ def process_lines(lines):
 
                 curr_secnd_half = None
                 next_first_half = None
+                
                 next_secnd_half = None
                 last_first_half = None
                 last_secnd_half = None
@@ -263,8 +273,6 @@ def process_lines(lines):
 if __name__ == '__main__':
     test_file = args.file
     for line in process_lines(read_lines(test_file)):
-        print(line)
-        #print(sub_tokens_in_line(line))
-        #if edited:
-        #print(edited)
+        print(sub_tokens_in_line(line))
+        #print(line)
         pass

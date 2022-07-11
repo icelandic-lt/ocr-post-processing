@@ -114,6 +114,8 @@ def lookup_similar(token, error_frequency=0):
 
 def spelling_modernized(original_token, edited_token):
     substitution_sequence = []
+    original_token = original_token.lower()
+    edited_token = edited_token.lower()
     sm = SequenceMatcher(None, original_token, edited_token).get_opcodes()
     for tag, i1, i2, j1, j2 in sm:
             if tag == 'replace':
@@ -124,11 +126,11 @@ def spelling_modernized(original_token, edited_token):
                     substitution_sequence.append(change)
                 except IndexError:
                     pass
-    return any([x in [('é', 'je'), ('s', 'z')] for x in substitution_sequence])
+    return any([x in [('é', 'je'), ('s', 'z'), ('p', 'f')] for x in substitution_sequence])
 
 
 if __name__ == '__main__':
-    print(map_edits('fjelag', 'félag'))
+    print(spelling_modernized('flokkaskiftingu', 'flokkaskiptingu'))
     # test_string = [
     #     'Kosninpúrslifin',
     #     'og ÞJóðviljinn',
