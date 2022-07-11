@@ -259,8 +259,8 @@ def process_lines(lines):
 if __name__ == '__main__':
     test_file = args.file
     for line in process_lines(read_lines(test_file)):
-        print(line)
-        #print(sub_tokens_in_line(line))
+        #print(line)
+        print(sub_tokens_in_line(line))
         #if edited:
         #print(edited)
         pass

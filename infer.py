@@ -24,12 +24,13 @@ parser.add_argument('--model')
 parser.add_argument('--infile')
 args, unknown = parser.parse_known_args()
 
-print(Path(args.model).stem)
 
 params = import_module(f'hyperparams.{Path(args.model).stem}')
 
 
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+CHECKPOINT = torch.load(args.model)
 
 MODEL = Seq2SeqTransformer(params.NUM_ENCODER_LAYERS,
                            params.NUM_DECODER_LAYERS,
@@ -42,7 +43,7 @@ MODEL = Seq2SeqTransformer(params.NUM_ENCODER_LAYERS,
 
 
 
-MODEL.load_state_dict(torch.load(args.model))
+MODEL.load_state_dict(CHECKPOINT['model_state_dict'])
 MODEL.to(DEVICE)
 special_symbols = ['<unk>', '<pad>', '<bos>', '<eos>']
 UNK_IDX = special_symbols.index('<unk>')

@@ -6,7 +6,7 @@ from pathlib import Path
 
 calling_module = Path(modules['__main__'].__file__).stem
 TOKENIZER_INFO = '3000_3'
-TEST_RUN = False
+TEST_RUN = True
 
 TOKENIZER = f'ocr_tokenizers/{TOKENIZER_INFO}/'
 
