@@ -1,10 +1,12 @@
+from cgi import test
 from tokens import SubstitutionToken
 from difflib import SequenceMatcher
 import pickle
-from format import clean_token, is_editable
+from format import clean_token, is_editable, split_keep_delimiter, extended_punctuation, format_token_out
+from tokens import OCRToken
 from islenska.bincompress import BinCompressed
 from islenska import Bin
-from Levenshtein import distance, editops
+from Levenshtein import distance
 
 bin_conn = BinCompressed()
 isl_lookup = Bin()
@@ -114,6 +116,8 @@ def lookup_similar(token, error_frequency=0):
 
 def spelling_modernized(original_token, edited_token):
     substitution_sequence = []
+    original_token = original_token.lower()
+    edited_token = edited_token.lower()
     sm = SequenceMatcher(None, original_token, edited_token).get_opcodes()
     for tag, i1, i2, j1, j2 in sm:
             if tag == 'replace':
@@ -124,38 +128,89 @@ def spelling_modernized(original_token, edited_token):
                     substitution_sequence.append(change)
                 except IndexError:
                     pass
-    return any([x in [('é', 'je'), ('s', 'z')] for x in substitution_sequence])
+    return any([x in [('é', 'je'), ('s', 'z'), ('p', 'f')] for x in substitution_sequence])
 
+def sub_tokens_in_line(line):
+    """
+    Substitute tokens that are most likely erroneous and have a
+    similar candidate in BÍN to which the Levenshtein distance
+    is short.
+    """
+    line_out = ''
+    #line = ' '.join(line.split('—'))
+    line = ' '.join(split_keep_delimiter(line, '—'))
+    for (index, token) in enumerate(line.split()):
+
+        token_out = token
+        # Declare variables to keep track of the punctuation surrounding the token
+        # A proper tokenizer doesn't work on OCRed files, because of the text's 
+        # unpredictability.
+        start_punct = None
+        end_punct = None
+        ocr_token = OCRToken(token)
+
+        
+        # Assign the punctuation to variables
+        if not ocr_token.is_punct:
+            if ocr_token.startswith_punct:
+                start_punct = ocr_token.start_punct
+            if ocr_token.endswith_punct:
+                end_punct = ocr_token.end_punct
+        # If the token exists in BÍN or OLD_WORDS or shouldn't be edited (see is_editable) it is simply returned as is
+        if exists_in_bin_or_old_words(ocr_token.clean) or not is_editable(token, index, len(line.split())) and not ocr_token.is_punct or makes_sense(ocr_token.clean):
+            token_out = ocr_token.clean   
+        # If the token does not exist in BÍN or OLD_WORDS or should be edited (see is_editable), look for a similar
+        # token, whose edit operations against the current token are known and appear more than 10 times.
+        else:
+            similar_token = lookup_similar(ocr_token.clean, error_frequency=69)
+            if similar_token:
+                if spelling_modernized(ocr_token.clean, str(similar_token)):
+                    token_out = ocr_token.clean
+                else:
+                    token_out = str(similar_token)
+            else:
+                token_out = str(ocr_token.clean)
+        # Restore the capitalization of token_out (inferred from the original token)
+        if token.islower():
+            token_out = token_out.lower()
+        elif token.isupper():
+            token_out = token_out.upper()
+        elif token.istitle():
+            token_out = token_out.title()
+        if token in extended_punctuation or ocr_token.is_punct:
+            token_out = token
+        if token_out == token:
+           line_out += format_token_out(token_out, start_punct=None, end_punct=None)
+        else:
+            line_out += format_token_out(token_out, start_punct=start_punct, end_punct=end_punct)
+    return line_out.strip()
 
 if __name__ == '__main__':
-    print(map_edits('fjelag', 'félag'))
-    # test_string = [
-    #     'Kosninpúrslifin',
-    #     'og ÞJóðviljinn',
-    #     'ÞJÓÐVILJINN reynir í frétt',
-    #     'og forustugrein í gær að telja',
-    #     'Ritstjórnarsímar: 4091, 4902.',
-    #     'Auglýsingar: Emilía Möller.',
-    #     'Auglýsingasími: 4906.',
-    #     'kaupstaðarins. Úrslitin á öðr-',
-    #     'um stöðum ræðir blaðið ekki,',
-    #     'nema hvað það birtir kosninga-'
-    #     'tölmmar nú og 1946. Ástæðan',
-    #     'liggur í augum uppi: Komm-',
-    #     'únistar hafa beðið ósigur um',
-    #     'land allt, þegar Norðfjörður er',
-    #     'undanskiIinn!   •',
-    #     'Ö1 og vindlar',
-    #     'altaf á fartinni hjá',
-    #     'E. Einarssyni.',
-    #     'og fleira ef þarf.'
-    # ]
-    # for line in test_string:
-    #     tokens = line.split()
-    #     for token in tokens:
-    #         clean = clean_token(token)
-    #         if not exists_in_bin_or_old_words(clean) and is_editable(clean, 0):
-    #             print(lookup_similar(clean))
-    #         else:
-    #             print(token)
-    # #print(get_similar_by_known_subs('kiörsljórn', ['kjörstjórn'], error_frequency=10))
+    test_string = [
+        'Kosninpúrslifin',
+        'og ÞJóðviljinn',
+        'ÞJÓÐVILJINN reynir í frétt',
+        'og forustugrein í gær að telja',
+        'Ritstjórnarsímar: 4091, 4902.',
+        'Auglýsingar: Emilía Möller.',
+        'Auglýsingasími: 4906.',
+        'kaupstaðarins. Úrslitin á öðr-',
+        'um stöðum ræðir blaðið ekki,',
+        'nema hvað það birtir kosninga-',
+        'tölmmar nú og 1946. Ástæðan',
+        'liggur í augum uppi: Komm-',
+        'únistar hafa beðið ósigur um',
+        'land allt, þegar Norðfjörður er',
+        'undanskiIinn!   •',
+        'Ö1 og vindlar',
+        'altaf á fartinni hjá',
+        'E. Einarssyni.',
+        'og fleira ef þarf.',
+        ':,: Mennirnir eru hér í kjörsíaðnum okkar',
+        '-„Jafnaðarmannsins“—er fyrsta',
+        'Þetta er saga jafnaðar-',
+        'Ég elska NY-hunda',
+        'Þeir töpuðu 632 at-!'
+    ]
+    for line in test_string:
+        print(sub_tokens_in_line(line))

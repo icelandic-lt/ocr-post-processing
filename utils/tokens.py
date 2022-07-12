@@ -3,6 +3,8 @@ from sql.lookup import SQLDatabase, SQLiteQuery
 from format import extended_punctuation
 from statistics import mean
 from math import log
+from format import clean_token
+
 
 def get_char_errors(ngr, freq=10):
     """
@@ -78,10 +80,11 @@ class OCRToken:
         # A list of punctuation marks (excl. hyphens) and character strings
         # (a word can contain a hyphen) of a given OCRed token.
         self.token_and_punct = re.findall(r'[\w\-—]+|[^\s\w]', self.original_token)
+        self.clean = self.original_token
 
         # The longest character string (possibly including a hyphen)
         # of self.token_and_punct
-        self.clean = max(self.token_and_punct, key=len)
+        #self.clean = max(self.token_and_punct, key=len)
 
         # Boolean. Whether self.clean consists of only numeric characters
         self.is_number = all(char.isnumeric() or char in [',', '.', '-'] for char in (str(self.original_token)))
@@ -91,12 +94,11 @@ class OCRToken:
 
 
         self.startswith_punct = self.original_token[0] in extended_punctuation
-        self.endswith_punct = (self.original_token[-1] in extended_punctuation
-                               and not self.original_token[-1] in ['—', '-'])
+        self.endswith_punct = (self.original_token[-1] in extended_punctuation)
 
 
         self.start_pattern = re.compile(f'^[{extended_punctuation}]*')
-        self.end_pattern = re.compile(f'[{extended_punctuation}]*$')
+        self.end_pattern = re.compile(f'[{extended_punctuation.replace("-", "")}]*$')
 
         self.start_punct_info = re.match(self.start_pattern, self.original_token)
         self.start_punct = self.start_punct_info.group()
@@ -106,7 +108,8 @@ class OCRToken:
         if self.end_punct_info:
             self.end_punct = self.end_punct_info.group()
             self.end_punct_span = self.end_punct_info.span()
-        
+         
+        self.clean = clean_token(self.original_token)
 
         # self.last_character_index = max([index for index, char in enumerate(self.original_token)
         #                                 if char not in extended_punctuation],
@@ -180,6 +183,9 @@ class SubstitutionToken:
         return self.token
 
 if __name__ == '__main__':
-    tok = OCRToken('<.')
-    print(dir(tok.start_punct))
+    tok = OCRToken('--menn—og')
+    print(tok.clean)
     print(tok.start_punct)
+    print(tok.end_punct)
+    print(tok.endswith_punct)
+    print(tok.is_punct)

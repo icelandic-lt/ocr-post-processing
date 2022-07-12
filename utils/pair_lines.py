@@ -1,24 +1,13 @@
-import pickle
-from Levenshtein import distance
-from tokens import OCRToken
 from argparse import ArgumentParser
-from lookup import (get_similar_by_known_subs, 
-                    exists_in_old_words, 
-                    get_most_similar_from_list, 
-                    makes_sense, exists_in_bin, 
-                    n_good_words, 
-                    exists_in_bin_or_old_words,
-                    old_tree,
-                    bin_tree,
-                    lookup_similar,
-                    spelling_modernized)
+from lookup import (makes_sense, exists_in_bin, exists_in_bin_or_old_words, 
+                    n_good_words,
+                    sub_tokens_in_line)
 from format import (clean_token, 
-                    format_line_out, 
-                    format_token_out, 
-                    is_editable)
+                    format_line_out)
 
 parser = ArgumentParser()
 parser.add_argument('-f', '--file')
+parser.add_argument('-l', '--include-lexicon-lookup', action='store_true')
 args = parser.parse_args()
 
 
@@ -105,61 +94,6 @@ def get_best_second_half_of_compound_line(line1, line2, line3):
         return line_1_1
 
 
-
-def sub_tokens_in_line(line):
-    """
-    Substitute tokens that are most likely erroneous and have a
-    similar candidate in BÍN to which the Levenshtein distance
-    is short.
-    """
-    line_out = ''
-    line = ' '.join(line.split('—'))
-    for (index, token) in enumerate(line.split()):
-        token_out = token
-        # Declare variables to keep track of the punctuation surrounding the token
-        # A proper tokenizer doesn't work on OCRed files, because of the text's 
-        # unpredictability.
-        start_punct = None
-        end_punct = None
-        ocr_token = OCRToken(token)
-        
-        # Assign the punctuation to variables
-        if not ocr_token.is_punct:
-            if ocr_token.startswith_punct:
-                start_punct = ocr_token.start_punct
-            if ocr_token.endswith_punct:
-                end_punct = ocr_token.end_punct
-
-        # If the token exists in BÍN or OLD_WORDS or shouldn't be edited (see is_editable) it is simply returned as is
-        if exists_in_bin_or_old_words(ocr_token.clean) or not is_editable(token, index) or ocr_token.is_punct:
-            token_out = ocr_token.clean
-        
-        # If the token does not exist in BÍN or OLD_WORDS or should be edited (see is_editable), look for a similar
-        # token, whose edit operations against the current token are known and appear more than 10 times.
-        else:
-            similar_token = lookup_similar(ocr_token.clean, error_frequency=10)
-            if similar_token:
-                if spelling_modernized(ocr_token.clean, str(similar_token)):
-                    token_out = ocr_token.clean
-                else:
-                    token_out = str(similar_token)
-            else:
-                token_out = ocr_token
-        
-        # Restore the capitalization of token_out (inferred from the original token)
-        if token.islower():
-            token_out = str(token_out).lower()
-        elif token.isupper():
-            token_out = str(token_out).upper()
-        elif token.istitle():
-            token_out = str(token_out).title()
-        if token_out == token:
-            line_out += format_token_out(str(token_out), start_punct=None, end_punct=None)
-        else:
-            line_out += format_token_out(str(token_out), start_punct=start_punct, end_punct=end_punct)
-    return line_out.strip()
-
-
 def process_lines(lines):
             """
             Iterate over all the lines in a file. The format is as such:
@@ -183,6 +117,7 @@ def process_lines(lines):
 
                 curr_secnd_half = None
                 next_first_half = None
+                
                 next_secnd_half = None
                 last_first_half = None
                 last_secnd_half = None
@@ -223,48 +158,62 @@ def process_lines(lines):
 
                 else:
                     # The two candidates will most of the time be the same.
-                    if curr_secnd_half == next_first_half:
-                        current_line_out = curr_secnd_half
-                    else:
-                        if curr_secnd_half:
-                            if curr_secnd_half.endswith('-'):
-                                best_comp_first_half = get_best_first_half_of_compound_line(lines[current_index],
-                                                                                            lines[current_index+1],
-                                                                                            lines[current_index+2])
-                                if best_comp_first_half:
-                                    current_line_out = best_comp_first_half
-                            else:
-                                n_good_curr = n_good_words(curr_secnd_half)
-                                n_good_next = n_good_words(next_first_half)
-                                if n_good_curr > n_good_next:
-                                    current_line_out = curr_secnd_half
+                    #if curr_secnd_half == next_first_half:
+                    #    current_line_out = curr_secnd_half
+                    if all([line_is_split, next_line_is_split, curr_secnd_half, next_first_half, last_secnd_half]):
+                        first_word_in_current_second_half = curr_secnd_half.split()[0]
+                        first_word_in_next_first_half = next_first_half.split()[0]
+                        last_word_in_last_second_half = last_secnd_half.split()[-1]
+                        if last_word_in_last_second_half.endswith('-'):
+                            last_word_in_last_second_half = last_word_in_last_second_half[:-1]
+                        combined_curr_secnd_last_secnd = last_word_in_last_second_half + first_word_in_current_second_half
+                        combined_next_first_last_secnd = last_word_in_last_second_half + first_word_in_next_first_half
+                        if exists_in_bin_or_old_words(combined_next_first_last_secnd):
+                            current_line_out = next_first_half
+                        else:
+                            current_line_out = curr_secnd_half
 
-                        # if all([last_first_half, last_last_secnd_half]):
-                        #     if all([last_first_half.endswith('-'), last_last_secnd_half.endswith('-')]):
-                        #         best_comp_second_half = get_best_second_half_of_compound_line(lines[current_index],
-                        #                                                                       last_line,
-                        #                                                                       last_last_line)
-                        #         if best_comp_second_half:
-                        #             try:
-                        #                 if not last_secnd_half.split()[0] == curr_first_half.split()[0]:
-                        #                     current_line_out = best_comp_second_half
-                        #             except:
-                        #                 pass
-
-                        # else:
-                        #     current_line_out = next_first_half
-
-                
                 if current_line_out is not None and not ((current_index + 1) == n_lines and current_line_out == ''):
                     yield format_line_out(current_line_out, ocr_junk)
-                current_index += 1
+                current_index += 1  
+                    # else:
+                    #     if curr_secnd_half:
+                    #         if curr_secnd_half.endswith('-'):
+                    #             best_comp_first_half = get_best_first_half_of_compound_line(lines[current_index],
+                    #                                                                         lines[current_index+1],
+                    #                                                                         lines[current_index+2])
+                    #             if best_comp_first_half:
+                    #                 current_line_out = best_comp_first_half
+                    #         else:
+                    #             n_good_curr = n_good_words(curr_secnd_half)
+                    #             n_good_next = n_good_words(next_first_half)
+                    #             if n_good_curr > n_good_next:
+                    #                 current_line_out = curr_secnd_half
+
+                    #     if all([last_first_half, last_last_secnd_half]):
+                    #         if all([last_first_half.endswith('-'), last_last_secnd_half.endswith('-')]):
+                    #             best_comp_second_half = get_best_second_half_of_compound_line(lines[current_index],
+                    #                                                                           last_line,
+                    #                                                                           last_last_line)
+                    #             if best_comp_second_half:
+                    #                 try:
+                    #                     if not last_secnd_half.split()[0] == curr_first_half.split()[0]:
+                    #                         current_line_out = best_comp_second_half
+                    #                 except:
+                    #                     pass
+
+                    #     else:
+                    #         current_line_out = next_first_half
+
+                
+
 
 
 if __name__ == '__main__':
     test_file = args.file
     for line in process_lines(read_lines(test_file)):
-        print(line)
-        #print(sub_tokens_in_line(line))
-        #if edited:
-        #print(edited)
-        pass
+        if args.include_lexicon_lookup:
+            print(sub_tokens_in_line(line))
+        else:
+            print(line)
+            pass
