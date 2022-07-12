@@ -98,7 +98,7 @@ class OCRToken:
 
 
         self.start_pattern = re.compile(f'^[{extended_punctuation}]*')
-        self.end_pattern = re.compile(f'[{extended_punctuation}]*$')
+        self.end_pattern = re.compile(f'[{extended_punctuation.replace("-", "")}]*$')
 
         self.start_punct_info = re.match(self.start_pattern, self.original_token)
         self.start_punct = self.start_punct_info.group()
@@ -183,8 +183,9 @@ class SubstitutionToken:
         return self.token
 
 if __name__ == '__main__':
-    tok = OCRToken('»')
+    tok = OCRToken('--menn—og')
     print(tok.clean)
+    print(tok.start_punct)
     print(tok.end_punct)
     print(tok.endswith_punct)
     print(tok.is_punct)

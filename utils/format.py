@@ -18,8 +18,13 @@ def format_token_out(token, start_punct, end_punct):
 
 def clean_token(token):
     token_out = token.strip(extended_punctuation.replace('-', ''))
+    # hyphen_index = token.find('-')
+    # if hyphen_index:
+    #     print(hyphen_index)
     if token.endswith('-') and not token_out.endswith('-'):
         token_out += '-'
+    if token.startswith('--'):
+        token_out = token_out[1:]
     return token_out
 
 
@@ -28,6 +33,7 @@ def format_line_out(line, junk_list):
     for junk in junk_list:
         tmp_line_out = line_out.replace(junk, '')
         line_out = tmp_line_out
+    line_out = line_out.replace(' – ', '–')
     return line_out.strip()
     #return ' '.join(line_out.split()).strip()
 
@@ -46,6 +52,10 @@ def is_editable(token, index, len_sent):
 def split_keep_delimiter(line, delimiter):
     line = line.split(delimiter)
     return [token + delimiter for token in line[:-1]] + [line[-1]]
+
+
+
+
 
 if __name__ == '__main__':
     spl = ' '.join(split_keep_delimiter('sjeu stjzttarflokkur,—talsmenn', '—'))
