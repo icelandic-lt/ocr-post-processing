@@ -187,12 +187,12 @@ if __name__ == '__main__':
             minute = time.minute
             print(ep_info, f'({day}/{month} {hours}:{minute})')
             outfile.write(ep_info + '\n')
-            torch.save(TRANSFORMER.state_dict(), f'models/{name}.model')
-            # torch.save({'epoch': epoch,
-            #             'model_state_dict': TRANSFORMER.state_dict(),
-            #             'optimizer_state_dict': OPTIMIZER.state_dict(),
-            #             'loss': train_loss,
-            #             }, f'models/{name}.model')
+            #torch.save(TRANSFORMER.state_dict(), f'models/{name}.model')
+            torch.save({'epoch': epoch,
+                        'model_state_dict': TRANSFORMER.state_dict(),
+                        'optimizer_state_dict': OPTIMIZER.state_dict(),
+                        'loss': train_loss,
+                        }, f'models/{name}.model')
         with open(f'hyperparams/{name}.py', 'w', encoding='utf-8') as outf:
             outf.write('VOCAB_SIZE = ' + str(tokenizer_vocab_size) + '\n')
             outf.write('VOCAB_MIN_FREQ = ' + str(TOKENIZER).split('_')[-1][:-1] + '\n')
