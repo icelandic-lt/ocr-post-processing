@@ -6,10 +6,11 @@ data/mid_val_data/
 textasafn_arnastofnun/
 data/ocr_books_textasafn/
 utils/infer_helpers.py
-data/all_texts_no_split/
-data/ocr_books/
-data/old_texts/
-data/ocr_textasafn/
+#data/all_texts_no_split/
+#data/ocr_books/
+#data/old_texts/
+#data/ocr_textasafn/
 data/1m
-data/1m_base
+data_on_hold/
+#data/1m_base
 bin_tree.pickle
