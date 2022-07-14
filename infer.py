@@ -42,9 +42,10 @@ MODEL = Seq2SeqTransformer(params.NUM_ENCODER_LAYERS,
                            params.DROPOUT)
 
 
-
-MODEL.load_state_dict(CHECKPOINT['model_state_dict'])
-#MODEL.load_state_dict(torch.load(args.model, map_location=torch.device('cpu')))
+try:
+    MODEL.load_state_dict(CHECKPOINT['model_state_dict'])
+except KeyError:
+    MODEL.load_state_dict(torch.load(args.model, map_location=torch.device('cpu')))
 MODEL.to(DEVICE)
 special_symbols = ['<unk>', '<pad>', '<bos>', '<eos>']
 UNK_IDX = special_symbols.index('<unk>')
