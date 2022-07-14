@@ -123,6 +123,8 @@ def process_lines(lines):
                 last_secnd_half = None
                 last_last_first_half = None
                 last_last_secnd_half = None
+                next_next_first_half = None
+                next_next_secnd_half = None
 
                 if line_is_split:
                     curr_secnd_half = lines[current_index].split('<newline>')[1].strip()
@@ -130,26 +132,27 @@ def process_lines(lines):
                     current_line_out = curr_secnd_half
                 else:
                     current_Line_out = curr_first_half
-                    
-                
-                
                 if not curr_line_is_last_in_file:
                     next_first_half = lines[current_index+1].split('<newline>')[0].strip()
                     next_line_is_split = len(lines[current_index+1].split('<newline>')) > 1
                     if next_line_is_split:
                         next_secnd_half = lines[current_index+1].split('<newline>')[1]
-
                 try:
                     last_line = lines[current_index-1]
                     last_first_half = last_line.split('<newline>')[0].strip()
                     last_secnd_half = last_line.split('<newline>')[1].strip()
                 except IndexError:
                     pass
-
                 try:
                     last_last_line = lines[current_index-2]
                     last_last_first_half = last_last_line.split('<newline>')[0].strip()
                     last_last_secnd_half = last_last_line.split('<newline>')[1].strip()
+                except IndexError:
+                    pass
+                try: 
+                    next_next_line = lines[current_index+2]
+                    next_next_first_half = next_next_line.split('<newline>')[0].strip()
+                    next_next_secnd_half = next_next_line.split('<newline>')[1].strip()
                 except IndexError:
                     pass
                 # This is only for the fist line. Special case because of the indexing.
@@ -157,10 +160,7 @@ def process_lines(lines):
                     yield curr_first_half
 
                 else:
-                    # The two candidates will most of the time be the same.
-                    #if curr_secnd_half == next_first_half:
-                    #    current_line_out = curr_secnd_half
-                    if all([line_is_split, next_line_is_split, curr_secnd_half, next_first_half, last_secnd_half]):
+                    if all([curr_secnd_half, next_first_half, last_secnd_half]):
                         first_word_in_current_second_half = curr_secnd_half.split()[0]
                         first_word_in_next_first_half = next_first_half.split()[0]
                         last_word_in_last_second_half = last_secnd_half.split()[-1]
@@ -172,39 +172,25 @@ def process_lines(lines):
                             current_line_out = next_first_half
                         else:
                             current_line_out = curr_secnd_half
-
+                    if all([curr_secnd_half, next_first_half, next_secnd_half]):
+                        last_word_in_curr_secnd_half = curr_secnd_half.split()[-1]
+                        last_word_in_next_first_half = next_first_half.split()[-1] 
+                        first_word_in_next_secnd_half = next_secnd_half.split()[0]                    
+                        if last_word_in_curr_secnd_half.endswith('-'):
+                            last_word_in_curr_secnd_half = last_word_in_curr_secnd_half[:-1]
+                        if last_word_in_next_first_half.endswith('-'):
+                            last_word_in_next_first_half = last_word_in_next_first_half[:-1]
+                        combined_curr_secnd_next_secnd = last_word_in_curr_secnd_half + first_word_in_next_secnd_half
+                        combined_next_first_next_secnd = last_word_in_next_first_half + first_word_in_next_secnd_half
+                        if combined_curr_secnd_next_secnd != combined_next_first_next_secnd:
+                            if exists_in_bin_or_old_words(combined_next_first_next_secnd):
+                                current_line_out = next_first_half
+                            else:
+                                current_line_out = curr_secnd_half                            
                 if current_line_out is not None and not ((current_index + 1) == n_lines and current_line_out == ''):
                     yield format_line_out(current_line_out, ocr_junk)
                 current_index += 1  
-                    # else:
-                    #     if curr_secnd_half:
-                    #         if curr_secnd_half.endswith('-'):
-                    #             best_comp_first_half = get_best_first_half_of_compound_line(lines[current_index],
-                    #                                                                         lines[current_index+1],
-                    #                                                                         lines[current_index+2])
-                    #             if best_comp_first_half:
-                    #                 current_line_out = best_comp_first_half
-                    #         else:
-                    #             n_good_curr = n_good_words(curr_secnd_half)
-                    #             n_good_next = n_good_words(next_first_half)
-                    #             if n_good_curr > n_good_next:
-                    #                 current_line_out = curr_secnd_half
-
-                    #     if all([last_first_half, last_last_secnd_half]):
-                    #         if all([last_first_half.endswith('-'), last_last_secnd_half.endswith('-')]):
-                    #             best_comp_second_half = get_best_second_half_of_compound_line(lines[current_index],
-                    #                                                                           last_line,
-                    #                                                                           last_last_line)
-                    #             if best_comp_second_half:
-                    #                 try:
-                    #                     if not last_secnd_half.split()[0] == curr_first_half.split()[0]:
-                    #                         current_line_out = best_comp_second_half
-                    #                 except:
-                    #                     pass
-
-                    #     else:
-                    #         current_line_out = next_first_half
-
+                    
                 
 
 

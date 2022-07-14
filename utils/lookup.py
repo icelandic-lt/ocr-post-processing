@@ -157,7 +157,7 @@ def sub_tokens_in_line(line):
             if ocr_token.endswith_punct:
                 end_punct = ocr_token.end_punct
         # If the token exists in BÍN or OLD_WORDS or shouldn't be edited (see is_editable) it is simply returned as is
-        if exists_in_bin_or_old_words(ocr_token.clean) or not is_editable(token, index, len(line.split())) and not ocr_token.is_punct or makes_sense(ocr_token.clean):
+        if exists_in_bin_or_old_words(ocr_token.clean) or not is_editable(token, index, len(line.split())) and not ocr_token.is_punct:
             token_out = ocr_token.clean   
         # If the token does not exist in BÍN or OLD_WORDS or should be edited (see is_editable), look for a similar
         # token, whose edit operations against the current token are known and appear more than 10 times.
@@ -210,7 +210,8 @@ if __name__ == '__main__':
         '-„Jafnaðarmannsins“—er fyrsta',
         'Þetta er saga jafnaðar-',
         'Ég elska NY-hunda',
-        'Þeir töpuðu 632 at-!'
+        'Þeir töpuðu 632 at-!',
+        'Úrgefandi: Jón Jónsson'
     ]
     for line in test_string:
         print(sub_tokens_in_line(line))
