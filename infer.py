@@ -109,11 +109,13 @@ if __name__ == '__main__':
     sents = list(read_lines(inp_file, OCR_TOKENIZER))
     COUNTER = 0
     N_LINES = len(sents)
-    with open(outfile, 'w', encoding='utf-8') as outf:
-        for sent in sents:
-            encoded_sent = ' '.join(sent)
-            COUNTER += 1
-            #encoded_sent = ' '.join(OCR_TOKENIZER(sent))
-            print(f'[{COUNTER}/{N_LINES}]')
-            #outf.write(sent + '\n')
-            outf.write(str(translate(MODEL, encoded_sent)) + '\n')
+    #with open(outfile, 'w', encoding='utf-8') as outf:
+    for sent in sents:
+        encoded_sent = ' '.join(sent)
+        translated_sent = translate(MODEL, encoded_sent)
+        print(translated_sent)
+        #COUNTER += 1
+        #encoded_sent = ' '.join(OCR_TOKENIZER(sent))
+        #print(f'[{COUNTER}/{N_LINES}]')
+        #outf.write(sent + '\n')
+        #outf.write(str(translate(MODEL, encoded_sent)) + '\n')

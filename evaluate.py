@@ -1,59 +1,74 @@
 import argparse
-from nltk.translate import chrf_score
+from nltk.translate import chrf_score, bleu_score
+from nltk.metrics import precision, recall, f_measure
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--original')
 parser.add_argument('--corrected')
 parser.add_argument('--transformed')
-parser.add_argument('--include-identical', action='store_true')
 args = parser.parse_args()
 
-def read_file(file):
+def read_file(file, for_precis=False):
     with open(file, 'r', encoding='utf-8') as infile:
-        for (index, line) in enumerate(infile):
-            yield (index, line.rstrip())
+        for line in infile:
+            if for_precis:
+                yield line.rstrip()
+            else:
+                yield line.rstrip()
 
+def evaluate_chrf(original_file, corrected_file, transformed_file):
+    original = list(read_file(original_file))
+    corrected = list(read_file(corrected_file))
+    transformed = list(read_file(transformed_file))
+    precis = precision(set(read_file(corrected_file, for_precis=True)), set(read_file(transformed_file, for_precis=True)))
+    rec = recall(set(read_file(corrected_file, for_precis=True)), set(read_file(transformed_file, for_precis=True)))
+    orig_corr_chrf = round(chrf_score.corpus_chrf(original, corrected), 7)
+    corr_trns_chrf = round(chrf_score.corpus_chrf(corrected, transformed), 7)
 
-def evaluate(original_file, corrected_file, transformed_file):
-    if args.include_identical:
-        original = [token for d, token in list(read_file(original_file))]
-        corrected = [token for d, token in list(read_file(corrected_file))]
-        transformed = [token for d, token in list(read_file(transformed_file))]
-        orig_corr_chrf = round(chrf_score.corpus_chrf(original, corrected), 7)
-        orig_trns_chrf = round(chrf_score.corpus_chrf(original, transformed), 7)
-        corr_trns_chrf = round(chrf_score.corpus_chrf(corrected, transformed), 7)
-
-    else:
-        original = list(read_file(original_file))
-        corrected = list(read_file(corrected_file))
-        transformed = list(read_file(transformed_file))
-
-        original_corrected_set = set(original) & set(corrected)
-        original_transformed_set = set(original) & set(transformed)
-        corrected_transformed_set = set(corrected) & set(transformed)
-
-        #
-        original_not_in_corrected = [line for (index, line) in original if (index, line) not in original_corrected_set]
-        corrected_not_in_original = [line for (index, line) in corrected if (index, line) not in original_corrected_set]
-        #
-        original_not_in_transformed = [line for (index, line) in original if (index, line) not in original_transformed_set]
-        transformed_not_in_original = [line for (index, line) in transformed if (index, line) not in original_transformed_set]
-        #
-        transformed_not_in_corrected = [line for (index, line) in transformed if (index, line) not in corrected_transformed_set]
-        corrected_not_in_transformed = [line for (index, line) in corrected if (index, line) not in corrected_transformed_set]
-
-        orig_corr_chrf = round(chrf_score.corpus_chrf(original_not_in_corrected, corrected_not_in_original), 7)
-        orig_trns_chrf = round(chrf_score.corpus_chrf(original_not_in_transformed, transformed_not_in_original), 7)
-        corr_trns_chrf = round(chrf_score.corpus_chrf(corrected_not_in_transformed, transformed_not_in_corrected), 7)
     scores = {
         'Original/Corrected CHRF:': orig_corr_chrf,
-        'Original/Transformed CHRF:': orig_trns_chrf,
         'Corrected/Transformed CHRF:': corr_trns_chrf,
         'Improvement:': round((corr_trns_chrf - orig_corr_chrf), 7),
-        'Prop improv:': round((corr_trns_chrf - orig_corr_chrf)/(1 - orig_corr_chrf), 7)
+        'Prop improv:': round((corr_trns_chrf - orig_corr_chrf)/(1 - orig_corr_chrf), 7),
+        'Precision': round(precis, 7),
+        'Recall': round(rec, 7)
+
     }
     return scores
 
+def evaluate_bleu(original_file, corrected_file, transformed_file):
+    scores = {
+
+    }
+    original_file = list([sent] for sent in original_file)
+    corrected_file = list(corrected_file)
+    original_corrected_score = bleu_score.corpus_bleu(original_file, corrected_file)
+    
+    corrected_file = [[sent] for sent in corrected_file]
+    transformed_file = list(transformed_file)
+    corrected_transformed_score = bleu_score.corpus_bleu(corrected_file, transformed_file)
+    
+    scores['Original/Corrected'] = round(original_corrected_score, 7)
+    scores['Corrected/Transformed'] = round(corrected_transformed_score, 7)
+    scores['Improvement:'] = round((corrected_transformed_score - original_corrected_score), 7)
+    scores['Prop improv:'] = round((corrected_transformed_score - original_corrected_score)/(1 - original_corrected_score), 7)
+    return scores
+
 if __name__=='__main__':
-    for i in evaluate(args.original, args.corrected, args.transformed).items():
+    chrf = """
+########
+# CHRF #
+########
+           """
+    bleu = """
+########
+# BLEU #
+########
+           """
+    print(chrf)
+    for i in evaluate_chrf(args.original, args.corrected, args.transformed).items():
+        print(i)
+    print(bleu)
+    for i in evaluate_bleu(read_file(args.original), read_file(args.corrected), read_file(args.transformed)).items():
         print(i)
