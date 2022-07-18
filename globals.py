@@ -5,7 +5,7 @@ from transformers import BertTokenizer
 from pathlib import Path
 
 calling_module = Path(modules['__main__'].__file__).stem
-TOKENIZER_INFO = '3000_3'
+TOKENIZER_INFO = '2000_3'
 TEST_RUN = False
 
 TOKENIZER = f'ocr_tokenizers/{TOKENIZER_INFO}/'
