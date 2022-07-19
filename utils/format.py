@@ -1,4 +1,3 @@
-from shlex import split
 from string import punctuation as p
 from tokenizer import correct_spaces
 extended_punctuation = p + "–„”“—«»"
@@ -33,10 +32,8 @@ def format_line_out(line, junk_list):
     for junk in junk_list:
         tmp_line_out = line_out.replace(junk, '')
         line_out = tmp_line_out
-    line_out = line_out.replace(' – ', '–')
-    #return line_out.strip()
+    # line_out = line_out.replace(' – ', '–')
     return correct_spaces(line_out)
-    #return ' '.join(line_out.split()).strip()
 
 def is_editable(token, index, len_sent):
     clean_token = ''.join([char for char in token if char.isalpha()])

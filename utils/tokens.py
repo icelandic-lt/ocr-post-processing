@@ -1,9 +1,8 @@
 import re
-from sql.lookup import SQLDatabase, SQLiteQuery
-from format import extended_punctuation
+from .sql.lookup import SQLDatabase, SQLiteQuery
+from .format import extended_punctuation, clean_token
 from statistics import mean
 from math import log
-from format import clean_token
 
 
 def get_char_errors(ngr, freq=10):
@@ -11,7 +10,7 @@ def get_char_errors(ngr, freq=10):
     This function returns known character replacements for a given ngram, based on how frequently it appears
     in an original/corrected OCR parallel corpus.
     """
-    sql = SQLDatabase(db_name='../dbs/replacements.db')
+    sql = SQLDatabase(db_name='dbs/replacements.db')
     query = SQLiteQuery(table_name='REPLACEMENTS', cursor=sql.cursor)
     return query.get_replacement_by_corrected(corrected_ngr=ngr, freq=freq)
 
@@ -158,7 +157,7 @@ class SubstitutionToken:
 
 
     def get_subs_freq(self, orig, repl):
-        sql = SQLDatabase(db_name='../dbs/replacements.db')
+        sql = SQLDatabase(db_name='dbs/replacements.db')
         query = SQLiteQuery(table_name='REPLACEMENTS', cursor=sql.cursor)
         return query.cursor.execute("""
                                         SELECT original, replacement, frequency

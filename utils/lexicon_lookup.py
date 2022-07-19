@@ -1,9 +1,7 @@
-from cgi import test
-from tokens import SubstitutionToken
 from difflib import SequenceMatcher
 import pickle
-from format import clean_token, is_editable, split_keep_delimiter, extended_punctuation, format_token_out
-from tokens import OCRToken
+from .format import clean_token, is_editable, split_keep_delimiter, extended_punctuation, format_token_out
+from .tokens import OCRToken, SubstitutionToken
 from islenska.bincompress import BinCompressed
 from islenska import Bin
 from Levenshtein import distance
@@ -74,11 +72,11 @@ def exists_in_bin_or_old_words(token):
 
 
 # BÍN stored in a BK-tree for fast fuzzy lookup
-with open('../bin_tree.pickle', 'rb') as bt:
+with open('utils/bin_tree.pickle', 'rb') as bt:
     bin_tree = pickle.load(bt)
 
 # Ritmálssafn stored in a BK-tree for fast fuzzy lookup
-with open('../old_words.pickle', 'rb') as ow:
+with open('utils/old_words.pickle', 'rb') as ow:
     old_tree = pickle.load(ow)
 
 

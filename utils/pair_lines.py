@@ -1,31 +1,21 @@
-from argparse import ArgumentParser
 from tokenizer import correct_spaces
-from lookup import (makes_sense, exists_in_bin, exists_in_bin_or_old_words, 
+from .lexicon_lookup import (makes_sense, exists_in_bin, exists_in_bin_or_old_words, 
                     n_good_words,
                     sub_tokens_in_line)
-from format import (clean_token, 
+from .format import (clean_token, 
                     format_line_out)
 
-parser = ArgumentParser()
-parser.add_argument('-f', '--file')
-parser.add_argument('-l', '--include-lexicon-lookup', action='store_true')
-args = parser.parse_args()
 
 
 
-ocr_junk = ['<unk>', 'alt;', 'quot;', 'aguot;', '139;', 'a39;', '& 39;', 'a 39;']
 
-
-
+ocr_junk = ['<unk>', 'alt;', 'quot;', 'aguot;', '139;', 'a39;', '& 39;', 'a 39;', 'alt;']
 
 def read_lines(file):
     with open(file, 'r', encoding='utf-8') as infile:
         return infile.read().splitlines()
 
-
-
-
-def process_lines(original_lines, transformed_lines):
+def process_transformed_lines(transformed_lines):
             """
             Iterate over all the lines in a file. The format is as such:
             First part of a sentence <newline> which continues here
@@ -69,7 +59,7 @@ def process_lines(original_lines, transformed_lines):
                     pass
                 # This is only for the fist line. Special case because of the indexing.
                 if current_index == 0:
-                    yield curr_first_half
+                    yield format_line_out(curr_first_half, ocr_junk)
 
                 else:
                     # The following code block has to do with picking a line based on whether the first word in the following
@@ -109,14 +99,16 @@ def process_lines(original_lines, transformed_lines):
                 if current_line_out is not None and not ((current_index + 1) == n_lines and current_line_out == ''):
                     yield format_line_out(current_line_out, ocr_junk)
                 current_index += 1  
-                    
-                
-
 
 
 if __name__ == '__main__':
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    parser.add_argument('-f', '--file')
+    parser.add_argument('-l', '--include-lexicon-lookup', action='store_true')
+    args = parser.parse_args()
     test_file = args.file
-    for line in process_lines(None, read_lines(test_file)):
+    for line in process_transformed_lines(read_lines(test_file)):
         if args.include_lexicon_lookup:
             print(sub_tokens_in_line(line))
         else:

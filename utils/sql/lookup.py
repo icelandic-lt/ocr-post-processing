@@ -8,7 +8,7 @@ class SQLDatabase:
         self.db_name = db_name
         self.connection = sqlite3.connect(db_name)
         self.connection.enable_load_extension(True)
-        self.connection.load_extension('../dbs/spellfix')
+        self.connection.load_extension('dbs/spellfix')
         self.connection.enable_load_extension(False)
         self.cursor = self.connection.cursor()
 

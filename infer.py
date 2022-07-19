@@ -10,6 +10,9 @@ from train import (text_transform,
                    TGT_LANGUAGE,
                    vocab_transform)
 from globals import OCR_TOKENIZER, wordpiece_vocab, read_lines
+from utils.pair_lines import process_transformed_lines
+from utils.lexicon_lookup import n_good_words, sub_tokens_in_line
+from tqdm import tqdm
 punctuation += "–„”—«»"
 
 
@@ -22,6 +25,7 @@ def read_file(file):
 parser = argparse.ArgumentParser()
 parser.add_argument('--model')
 parser.add_argument('--infile')
+parser.add_argument('-l', '--include-lexicon-lookup', action='store_true')
 args, unknown = parser.parse_known_args()
 
 
@@ -55,10 +59,10 @@ EOS_IDX = special_symbols.index('<eos>')
 
 
 
-def generate_square_subsequent_mask(sz):
-    mask = (torch.triu(torch.ones((sz, sz), device=DEVICE)) == 1).transpose(0, 1)
-    mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
-    return mask
+# def generate_square_subsequent_mask(sz):
+#     mask = (torch.triu(torch.ones((sz, sz), device=DEVICE))==1).transpose(0, 1)
+#     mask = mask.float().masked_fill(mask==0, float('-inf')).masked_fill(mask==1, float(0.0))
+#     return mask
 
 
 def greedy_decode(model, src, src_mask, max_len, start_symbol):
@@ -68,7 +72,7 @@ def greedy_decode(model, src, src_mask, max_len, start_symbol):
     ys = torch.ones(1, 1).fill_(start_symbol).type(torch.long).to(DEVICE)
     for _ in range(max_len-1):
         memory = memory.to(DEVICE)
-        tgt_mask = (generate_square_subsequent_mask(ys.size(0))
+        tgt_mask = (torch.nn.Transformer.generate_square_subsequent_mask(ys.size(0))
                     .type(torch.bool)).to(DEVICE)
         out = model.decode(ys, memory, tgt_mask)
         out = out.transpose(0, 1)
@@ -82,6 +86,15 @@ def greedy_decode(model, src, src_mask, max_len, start_symbol):
     return ys
 
 
+def detokenize(line):
+    line = ' '.join(line).replace(' <unk> <unk> ', '')
+    line = line.replace(' ##', '')
+    line = line.replace(' # # ', '')
+    line = line.replace('<bos>', '').replace('<eos>', '')
+    line = correct_spaces(line)
+    return line
+
+
 def translate(model: torch.nn.Module, src_sentence: str):
     model.eval()
     src = text_transform[SRC_LANGUAGE](src_sentence).view(-1, 1)
@@ -90,15 +103,19 @@ def translate(model: torch.nn.Module, src_sentence: str):
     tgt_tokens = greedy_decode(model, src, src_mask,
                                max_len=num_tokens + 5,
                                start_symbol=BOS_IDX).flatten()
-    outp = (vocab_transform[TGT_LANGUAGE].lookup_tokens(list(tgt_tokens.cpu().numpy())))
-    outp = ' '.join(outp).replace(' <unk> <unk> ', '')
-    outp = outp.replace(' ##', '')
-    outp = outp.replace(' # # ', '')
-    outp = outp.replace('<bos>', '').replace('<eos>', '')
-    outp = correct_spaces(outp)
-    if outp.endswith(' '):
-        outp = outp[:-1]
+    outp = vocab_transform[TGT_LANGUAGE].lookup_tokens(list(tgt_tokens.cpu().numpy()))
     return outp
+
+
+def transform_file(file):
+    sents = list(read_lines(inp_file, OCR_TOKENIZER))
+    for sent in tqdm(sents, desc='Fixing OCR errors'):
+        str_sent = ' '.join(sent)
+        transformed_sent = detokenize(translate(MODEL, str_sent))
+        if args.include_lexicon_lookup:
+            transformed_sent = sub_tokens_in_line(transformed_sent)
+        yield transformed_sent
+
 
 if __name__ == '__main__':
     tokenizer_vocab_size = len(wordpiece_vocab)
@@ -109,13 +126,28 @@ if __name__ == '__main__':
     sents = list(read_lines(inp_file, OCR_TOKENIZER))
     COUNTER = 0
     N_LINES = len(sents)
+    original_file = read_file(inp_file)
+    transformed_file = list(transform_file(inp_file))
+    for original_line, transformed_line in tqdm(zip(original_file, process_transformed_lines(transformed_file)), desc='Pairing lines'):
+        original_n_good_words = n_good_words(original_line)
+        transformed_n_good_words = n_good_words(transformed_line)
+        if original_n_good_words > transformed_n_good_words:
+            line_out = original_line
+        else:
+            line_out = transformed_line
+        print(transformed_line)
+        #print(original_line, n_good_words(original_line), '###', transformed_line, n_good_words(transformed_line))
+    
+    #    print(line)
+    #for i in transform_file(inp_file):
+    #    print(i)
     #with open(outfile, 'w', encoding='utf-8') as outf:
-    for sent in sents:
-        encoded_sent = ' '.join(sent)
-        translated_sent = translate(MODEL, encoded_sent)
-        print(translated_sent)
-        #COUNTER += 1
-        #encoded_sent = ' '.join(OCR_TOKENIZER(sent))
-        #print(f'[{COUNTER}/{N_LINES}]')
-        #outf.write(sent + '\n')
-        #outf.write(str(translate(MODEL, encoded_sent)) + '\n')
+    #for sent in sents:
+        # encoded_sent = ' '.join(sent)
+        # translated_sent = translate(MODEL, encoded_sent)
+        # print(detokenize(translated_sent))
+        # COUNTER += 1
+        # encoded_sent = ' '.join(OCR_TOKENIZER(sent))
+        # print(f'[{COUNTER}/{N_LINES}]')
+        # outf.write(sent + '\n')
+        # outf.write(str(translate(MODEL, encoded_sent)) + '\n')
