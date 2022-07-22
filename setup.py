@@ -10,8 +10,6 @@ from globals import (read_files,
                      ORIGINAL_VAL_FILES,
                      CORRECTED_VAL_FILES,
                      TOKENIZER_INFO)
-from train import SRC_LANGUAGE, TGT_LANGUAGE
-from ocr_dataset import OCRDataset
 
 
 parser = argparse.ArgumentParser()
@@ -34,18 +32,13 @@ if __name__ == '__main__':
         training_data = pandas.DataFrame()
         training_data['original'] = list(read_files(ORIGINAL_FILES, tokenizer=tokenize))
         training_data['corrected'] = list(read_files(CORRECTED_FILES, tokenizer=tokenize))
-        TRAINING_DATASET = OCRDataset(df=training_data, source_column=SRC_LANGUAGE, target_column=TGT_LANGUAGE)
-        torch.save(training_data(TRAINING_DATASET.source_vocab), 'dataframes/train_src_vocab.pth')
-        torch.save(training_data(TRAINING_DATASET.target_vocab), 'dataframes/train_tgt_vocab.pth')
         training_data.to_pickle(f'dataframes/training_data_{TOKENIZER_INFO}.pickle')
 
         print('> Building validation dataframe')
         validation_data = pandas.DataFrame()
         validation_data['original'] = list(read_files(ORIGINAL_VAL_FILES, tokenizer=tokenize))
         validation_data['corrected'] = list(read_files(CORRECTED_VAL_FILES, tokenizer=tokenize))
-        VALIDATION_DATASET = OCRDataset(df=VALIDATION_DATA, source_column=SRC_LANGUAGE, target_column=TGT_LANGUAGE)
-        torch.save(validation_data(VALIDATION_DATASET.source_vocab), 'dataframes/val_src_vocab.pth')
-        torch.save(validation_data(VALIDATION_DATASET.target_vocab), 'dataframes/val_tgt_vocab.pth')
+
         validation_data.to_pickle(f'dataframes/validation_data_{TOKENIZER_INFO}.pickle')
 
     elif args.type == 'errors':

@@ -93,7 +93,7 @@ def detokenize(line):
     return line
 
 
-def translate(model, src_sentence: str):
+def translate(model: torch.nn.Module, src_sentence: str):
     model.eval()
     src = text_transform[SRC_LANGUAGE](src_sentence).view(-1, 1)
     num_tokens = src.shape[0]
