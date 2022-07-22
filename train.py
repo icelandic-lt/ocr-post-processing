@@ -18,14 +18,14 @@ from ocr_dataset import OCRDataset
 from transformer_classes import Seq2SeqTransformer
 from glob import glob
 from tqdm import tqdm
+import pandas
 
 from globals import (ORIGINAL_FILES,
                      CORRECTED_FILES,
                      OCR_TOKENIZER,
                      wordpiece_vocab,
-                     TRAINING_DATA,
-                     VALIDATION_DATA,
-                     TOKENIZER)
+                     TOKENIZER,
+                     TOKENIZER_INFO)
 
 
 
@@ -38,12 +38,11 @@ PAD_IDX = SPECIAL_SYMBOLS.index('<pad>')
 BOS_IDX = SPECIAL_SYMBOLS.index('<bos>')
 EOS_IDX = SPECIAL_SYMBOLS.index('<eos>')
 
-TRAINING_DATASET = OCRDataset(df=TRAINING_DATA, source_column=SRC_LANGUAGE, target_column=TGT_LANGUAGE)
-VALIDATION_DATASET = OCRDataset(df=VALIDATION_DATA, source_column=SRC_LANGUAGE, target_column=TGT_LANGUAGE)
+
 
 with open('data/dev_source.vocab', 'rb') as infile:
     src_vocab = pickle.load(infile)
-with open('data/dev/dev_target.vocab', 'rb') as infile:
+with open('data/dev_target.vocab', 'rb') as infile:
     tgt_vocab = pickle.load(infile)
 
 token_transform = {}
@@ -130,7 +129,6 @@ def collate_fn(batch):
     tgt_batch = pad_sequence(tgt_batch, padding_value=PAD_IDX)
     return src_batch, tgt_batch
 
-VALIDATION_DATALOADER = DataLoader(VALIDATION_DATASET, batch_size=params.BATCH_SIZE, collate_fn=collate_fn)
 
 def train_epoch(model, train_optimizer, training_dataset):
     model.train()
@@ -170,6 +168,13 @@ def evaluate(model):
     return losses / len(VALIDATION_DATALOADER)
 
 if __name__ == '__main__':
+    TRAINING_DATA = pandas.read_pickle(f'dataframes/training_data_{TOKENIZER_INFO}.pickle')
+    VALIDATION_DATA = pandas.read_pickle(f'dataframes/validation_data_{TOKENIZER_INFO}.pickle')
+
+    TRAINING_DATASET = OCRDataset(df=TRAINING_DATA, source_column=SRC_LANGUAGE, target_column=TGT_LANGUAGE)
+    VALIDATION_DATASET = OCRDataset(df=VALIDATION_DATA, source_column=SRC_LANGUAGE, target_column=TGT_LANGUAGE)
+    VALIDATION_DATALOADER = DataLoader(VALIDATION_DATASET, batch_size=params.BATCH_SIZE, collate_fn=collate_fn)
+
     tokenizer_vocab_size = len(wordpiece_vocab)
     NUM_EPOCHS = params.NUM_EPOCHS
     for epoch in range(1, NUM_EPOCHS+1):
