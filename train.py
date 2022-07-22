@@ -47,7 +47,7 @@ VALIDATION_DATASET = OCRDataset(df=VALIDATION_DATA, source_column=SRC_LANGUAGE, 
 token_transform = {}
 vocab_transform = {}
 
-# The tokenizer function (the one that returns a string) set to token transform dict
+# The tokenizer function set to token transform dict
 token_transform[SRC_LANGUAGE] = OCR_TOKENIZER
 token_transform[TGT_LANGUAGE] = OCR_TOKENIZER
 
