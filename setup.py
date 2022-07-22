@@ -10,6 +10,7 @@ from globals import (read_files,
                      ORIGINAL_VAL_FILES,
                      CORRECTED_VAL_FILES,
                      TOKENIZER_INFO)
+from ocr_dataset import OCRDataset
 
 
 parser = argparse.ArgumentParser()
