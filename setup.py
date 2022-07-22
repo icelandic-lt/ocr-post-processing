@@ -9,7 +9,9 @@ from globals import (read_files,
                      CORRECTED_FILES,
                      ORIGINAL_VAL_FILES,
                      CORRECTED_VAL_FILES,
-                     TOKENIZER_INFO)
+                     TOKENIZER_INFO,
+                     SRC_LANGUAGE,
+                     TGT_LANGUAGE)
 from ocr_dataset import OCRDataset
 
 
