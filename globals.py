@@ -5,22 +5,15 @@ from transformers import BertTokenizer
 from pathlib import Path
 
 calling_module = Path(modules['__main__'].__file__).stem
+
 TOKENIZER_INFO = '3000_3'
-TEST_RUN = False
 
 TOKENIZER = f'ocr_tokenizers/{TOKENIZER_INFO}/'
 
-if TEST_RUN:
-    ORIGINAL_FILES = 'data/toy_corpus/training/original'
-    CORRECTED_FILES = 'data/toy_corpus/training/corrected'
-    ORIGINAL_VAL_FILES = 'data/toy_corpus/validation/original'
-    CORRECTED_VAL_FILES = 'data/toy_corpus/validation/corrected'
-
-else:
-    ORIGINAL_FILES = 'data/1m/training/original'
-    CORRECTED_FILES = 'data/1m/training/corrected'
-    ORIGINAL_VAL_FILES = 'data/1m/validation/original'
-    CORRECTED_VAL_FILES = 'data/1m/validation/corrected'
+ORIGINAL_FILES = 'data/1m/training/original'
+CORRECTED_FILES = 'data/1m/training/corrected'
+ORIGINAL_VAL_FILES = 'data/1m/validation/original'
+CORRECTED_VAL_FILES = 'data/1m/validation/corrected'
 
 
 # These files don't exist when setup.py is run.
@@ -45,10 +38,6 @@ def read_lines(file, tokenizer):
                 combined = line
             yield tokenizer(combined)
 
-# def read_lines(file, tokenizer):
-#     with open(file, 'r', encoding='utf-8') as infile:
-#         for line in infile:
-#             yield tokenizer(line)
 
 def read_files(path, tokenizer):
     all_files = glob(f'{path}/*')
