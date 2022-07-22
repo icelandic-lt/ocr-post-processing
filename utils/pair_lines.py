@@ -15,7 +15,7 @@ def read_lines(file):
     with open(file, 'r', encoding='utf-8') as infile:
         return infile.read().splitlines()
 
-def process_transformed_lines(transformed_lines):
+def process_torch_lines(transformed_lines):
             """
             Iterate over all the lines in a file. The format is as such:
             First part of a sentence <newline> which continues here

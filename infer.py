@@ -10,9 +10,12 @@ from train import (text_transform,
                    TGT_LANGUAGE,
                    vocab_transform)
 from globals import OCR_TOKENIZER, wordpiece_vocab, read_lines
-from utils.pair_lines import process_transformed_lines
-from utils.lexicon_lookup import n_good_words, sub_tokens_in_line
+from utils.pair_lines import process_torch_lines
+from utils.lexicon_lookup import n_good_words, sub_tokens_in_line, makes_sense, exists_in_bin_or_old_words
+from utils.format import clean_token
 from tqdm import tqdm
+from fairseq.models.transformer import TransformerModel
+
 punctuation += "–„”—«»"
 
 
@@ -26,6 +29,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--model')
 parser.add_argument('--infile')
 parser.add_argument('-l', '--include-lexicon-lookup', action='store_true')
+parser.add_argument('-f', '--fairseq-only', action='store_true')
+parser.add_argument('-t', '--torch-only', action='store_true')
 args, unknown = parser.parse_known_args()
 
 
@@ -56,13 +61,6 @@ UNK_IDX = special_symbols.index('<unk>')
 PAD_IDX = special_symbols.index('<pad>')
 BOS_IDX = special_symbols.index('<bos>')
 EOS_IDX = special_symbols.index('<eos>')
-
-
-
-# def generate_square_subsequent_mask(sz):
-#     mask = (torch.triu(torch.ones((sz, sz), device=DEVICE))==1).transpose(0, 1)
-#     mask = mask.float().masked_fill(mask==0, float('-inf')).masked_fill(mask==1, float(0.0))
-#     return mask
 
 
 def greedy_decode(model, src, src_mask, max_len, start_symbol):
@@ -109,15 +107,25 @@ def translate(model: torch.nn.Module, src_sentence: str):
 
 def transform_file(file):
     sents = list(read_lines(inp_file, OCR_TOKENIZER))
-    for sent in tqdm(sents, desc='Fixing OCR errors'):
+    for sent in tqdm(sents, desc='[1/3]'):
         str_sent = ' '.join(sent)
         transformed_sent = detokenize(translate(MODEL, str_sent))
-        if args.include_lexicon_lookup:
-            transformed_sent = sub_tokens_in_line(transformed_sent)
+        yield transformed_sent
+
+
+def fairseq_transform_file(file):
+    model = TransformerModel.from_pretrained('frsq/models/',
+                                             checkpoint_file='checkpoint_best.pt',
+                                             data_name_or_path='frsq/data/data-bin.3000',
+                                             bpe='sentencepiece',
+                                             sentencepiece_model='frsq/data/sentencepiece/data/sentencepiece_3000.bpe.model')
+    for line in tqdm(list(read_file(file)), desc='[2/3]'):
+        transformed_sent = model.translate(line)
         yield transformed_sent
 
 
 if __name__ == '__main__':
+    out_lines = []
     tokenizer_vocab_size = len(wordpiece_vocab)
     inp_file = args.infile
     inp_filename = Path(inp_file).name
@@ -127,17 +135,83 @@ if __name__ == '__main__':
     COUNTER = 0
     N_LINES = len(sents)
     original_file = read_file(inp_file)
-    transformed_file = list(transform_file(inp_file))
-    for original_line, transformed_line in tqdm(zip(original_file, process_transformed_lines(transformed_file)), desc='Pairing lines'):
-        original_n_good_words = n_good_words(original_line)
-        transformed_n_good_words = n_good_words(transformed_line)
-        if original_n_good_words > transformed_n_good_words:
-            line_out = original_line
-        else:
-            line_out = transformed_line
-        print(transformed_line)
-        #print(original_line, n_good_words(original_line), '###', transformed_line, n_good_words(transformed_line))
-    
+
+    if args.torch_only:
+        torch_file = list(transform_file(inp_file))
+        torch_file = process_torch_lines(torch_file)
+        for line in torch_file:
+            out_lines.append(line)
+    elif args.fairseq_only:
+        frsq_file = list(fairseq_transform_file(inp_file))
+        for line in frsq_file:
+            out_lines.append(line)
+    else:
+        torch_file = list(transform_file(inp_file))
+        frsq_file = list(fairseq_transform_file(inp_file))
+        for original_line, torch_line, frsq_line in tqdm(zip(original_file, process_torch_lines(torch_file), frsq_file), desc='[3/3]'):
+            line_out = ''
+            torch_tokens = torch_line.split()
+            frsq_tokens = frsq_line.split()
+            if len(torch_tokens) == len(frsq_tokens) and torch_tokens[-1] == frsq_tokens[-1]:
+                tmp_line_out = ''
+                for (index, (torch_tok, frqs_tok)) in enumerate(zip(torch_tokens, frsq_tokens)):
+                    if index in [0, len(torch_tokens)]:
+                        tmp_line_out += f'{torch_tok} '
+                    else:
+                        if exists_in_bin_or_old_words(clean_token(torch_tok)):
+                            tmp_line_out += f'{torch_tok} '
+                        else:
+                            tmp_line_out += f'{frqs_tok} '
+                try:
+                    transformed_n_good_words = n_good_words(torch_line)
+                except ZeroDivisionError:
+                    transformed_n_good_words = 0
+                
+                try:
+                    frsq_n_good_words = n_good_words(frsq_line)
+                except ZeroDivisionError:
+                    frsq_n_good_words = 0
+
+                try:
+                    modified_n_good_words = n_good_words(tmp_line_out)
+                except ZeroDivisionError:
+                    modified_n_good_words = 0
+                
+                best_line = max([(tmp_line_out, modified_n_good_words), (torch_line, transformed_n_good_words), (frsq_line, frsq_n_good_words)], key=lambda x: x[1])
+                line_out = best_line[0]
+            else:
+                line_out = torch_line
+            out_lines.append(line_out)
+    with open(outfile, 'w', encoding='utf-8') as outf:
+        for line_out in out_lines:
+            if args.include_lexicon_lookup:
+                line_out = sub_tokens_in_line(line_out).rstrip()
+            else:
+                line_out = line_out.rstrip()
+            outf.write(line_out + '\n')
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
     #    print(line)
     #for i in transform_file(inp_file):
     #    print(i)

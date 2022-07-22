@@ -21,8 +21,11 @@ def evaluate_chrf(original_file, corrected_file, transformed_file):
     original = list(read_file(original_file))
     corrected = list(read_file(corrected_file))
     transformed = list(read_file(transformed_file))
-    precis = precision(set(read_file(corrected_file, for_precis=True)), set(read_file(transformed_file, for_precis=True)))
-    rec = recall(set(read_file(corrected_file, for_precis=True)), set(read_file(transformed_file, for_precis=True)))
+    met_corr = set(read_file(corrected_file, for_precis=True))
+    met_trans = set(read_file(transformed_file, for_precis=True))
+    precis = precision(met_corr, met_trans)
+    rec = recall(met_corr, met_trans)
+    f_meas = f_measure(met_corr, met_trans)
     orig_corr_chrf = round(chrf_score.corpus_chrf(original, corrected), 7)
     corr_trns_chrf = round(chrf_score.corpus_chrf(corrected, transformed), 7)
 
@@ -32,7 +35,8 @@ def evaluate_chrf(original_file, corrected_file, transformed_file):
         'Improvement:': round((corr_trns_chrf - orig_corr_chrf), 7),
         'Prop improv:': round((corr_trns_chrf - orig_corr_chrf)/(1 - orig_corr_chrf), 7),
         'Precision': round(precis, 7),
-        'Recall': round(rec, 7)
+        'Recall': round(rec, 7),
+        'F-Measure': round(f_meas, 7)
 
     }
     return scores
