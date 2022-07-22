@@ -15,9 +15,8 @@ CORRECTED_FILES = 'data/1m/training/corrected'
 ORIGINAL_VAL_FILES = 'data/1m/validation/original'
 CORRECTED_VAL_FILES = 'data/1m/validation/corrected'
 
-
 # These files don't exist when setup.py is run.
-if calling_module != 'setup':
+if calling_module not in ['setup', 'infer']:
     TRAINING_DATA = pandas.read_pickle(f'dataframes/training_data_{TOKENIZER_INFO}.pickle')
     VALIDATION_DATA = pandas.read_pickle(f'dataframes/validation_data_{TOKENIZER_INFO}.pickle')
 

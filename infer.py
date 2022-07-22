@@ -6,9 +6,9 @@ import torch
 from tokenizer import correct_spaces
 from transformer_classes import Seq2SeqTransformer
 from train import (text_transform,
+                   vocab_transform,
                    SRC_LANGUAGE,
-                   TGT_LANGUAGE,
-                   vocab_transform)
+                   TGT_LANGUAGE)
 from globals import OCR_TOKENIZER, wordpiece_vocab, read_lines
 from utils.pair_lines import process_torch_lines
 from utils.lexicon_lookup import n_good_words, sub_tokens_in_line, makes_sense, exists_in_bin_or_old_words

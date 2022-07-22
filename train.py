@@ -1,6 +1,7 @@
 from pathlib import Path
 from timeit import default_timer as timer
 from datetime import datetime
+import pickle
 import argparse
 from typing import List
 import pandas as pd
@@ -27,9 +28,6 @@ from globals import (ORIGINAL_FILES,
                      TOKENIZER)
 
 
-#parser = argparse.ArgumentParser()
-#parser.add_argument('--tokenizer')
-#args, unknown = parser.parse_known_args()
 
 DEVICE = device('cuda' if cuda.is_available() else 'cpu')
 SRC_LANGUAGE = 'original'
@@ -43,6 +41,10 @@ EOS_IDX = SPECIAL_SYMBOLS.index('<eos>')
 TRAINING_DATASET = OCRDataset(df=TRAINING_DATA, source_column=SRC_LANGUAGE, target_column=TGT_LANGUAGE)
 VALIDATION_DATASET = OCRDataset(df=VALIDATION_DATA, source_column=SRC_LANGUAGE, target_column=TGT_LANGUAGE)
 
+with open('data/dev_source.vocab', 'rb') as infile:
+    src_vocab = pickle.load(infile)
+with open('data/dev/dev_target.vocab', 'rb') as infile:
+    tgt_vocab = pickle.load(infile)
 
 token_transform = {}
 vocab_transform = {}
@@ -52,8 +54,8 @@ token_transform[SRC_LANGUAGE] = OCR_TOKENIZER
 token_transform[TGT_LANGUAGE] = OCR_TOKENIZER
 
 # The training dataset vocabulary set to vocabulary transform dict
-vocab_transform[SRC_LANGUAGE] = TRAINING_DATASET.source_vocab
-vocab_transform[TGT_LANGUAGE] = TRAINING_DATASET.target_vocab
+vocab_transform[SRC_LANGUAGE] = src_vocab
+vocab_transform[TGT_LANGUAGE] = tgt_vocab
 vocab_transform[SRC_LANGUAGE].set_default_index(UNK_IDX)
 vocab_transform[TGT_LANGUAGE].set_default_index(UNK_IDX)
 
