@@ -1,6 +1,24 @@
 # Leiðrétting ljóslestrarvillna
 
-Þessi gagnahirsla inniheldur tól til þess að þjálfa ljóslestrarvilluleiðréttingarlíkan.
+Þessi gagnahirsla inniheldur
+
+* tvö þjálfuð transformer-líkön (PyTorch og fairseq) til leiðréttingar á ljóslestrarvillum
+* `infer.py` til leiðréttingar á ljóslestrarvillum
+* `train.py` til þjálfunar Transformer-líkana (PyTorch)
+
+Forritið á að virka að því sóttu og forritseiningum uppsettum (`python3 -m pip install -r requirements.txt`).
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 
 ##### Lykilskrár
 
