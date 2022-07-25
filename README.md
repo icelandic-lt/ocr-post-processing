@@ -1,13 +1,109 @@
 # Leiðrétting ljóslestrarvillna
 
-Þessi gagnahirsla inniheldur
+Þessi gagnahirsla inniheldur meðal annars:
 
 * tvö þjálfuð transformer-líkön (PyTorch og fairseq) til leiðréttingar á ljóslestrarvillum
-* `infer.py` til leiðréttingar á ljóslestrarvillum
-* `train.py` til þjálfunar Transformer-líkana (PyTorch)
+* `infer.py` til að leiðrétta ljóslestrarvillur
+* `train.py` til að þjálfa transformer-líkön (PyTorch)
 
-Forritið á að virka að því sóttu og forritseiningum uppsettum (`python3 -m pip install -r requirements.txt`).
+Tólið á að virka að forritseiningum uppsettum (`python3 -m pip install -r requirements.txt`) en til þess að þjálfa ný líkön þarf að útbúa þjálfunargögn (sjá [uppsetningu gagna](#uppsetning-gagna)).
 
+PyTorch-líkanið var þjálfað með WordPiece-tilreiðara og fairseq með SentencePiece, báðum skipt í 3000 einingar. Fyrrnefnda líkanið nær meiri nákvæmni með tilliti til bókstafa en hið síðarnefnda sé litið til orða.
+
+Í núverandi mynd nær leiðréttingartólið þessum árangri með prófunargögnin til hliðsjónar:
+
+<table>
+  <tr>
+    <th></th>
+    <th>PyTorch</th>
+    <th>fairseq</th>
+    <th>Combined</th>
+  </tr>
+  
+  <tr>
+    <th>chrF</th>
+    <td>96.84</td>
+    <td>96.35</td>
+    <td>96.85</td>
+  </tr>
+  
+  <tr>
+    <th>chrF ERR</th>
+    <td>41.2</td>
+    <td>32.2</td>
+    <td>41.5</td>
+  </tr>
+  <tr>
+    <th>BLEU</th>
+    <td>98.44</td>
+    <td>98.52</td>
+    <td>98.45</td>
+    </tr>
+  <tr>
+    <th>BLEU ERR</th>
+    <td>44.45</td>
+    <td>47.24</td>
+    <td>44.74</td>
+  </tr>
+    <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+(ERR = Error Rate Reduction: fækkun ljóslestrarvillna í prósentum talið)
+
+<br>
+
+Líkönin voru þjálfuð á u.þ.b. 900.000 línum (~7.000.000 orð) en af þeim voru ekki nema um 50.000 (~400.000 orð) úr raunverulegum ljóslesnum gögnum. Ætla má að aukið magn slíkra gagna gæti bætt tólið umtalsvert.
+<br>
+<br>
+
+## Uppsetning gagna
+---
+Sökum skorts raungagna á forminu **ljóslesinn/leiðréttur texti** voru gervivillur (e. artificial errors) settar inn í texta sem m.a. voru sóttir úr [Risamálheildinni](https://repository.clarin.is/repository/xmlui/handle/20.500.12537/192). Villurnar voru fengnar úr þeim ljóslesnu/leiðréttu gögnum sem til eru. Eftirfarandi skriftur má nota í þeim tilgangi:
+
+* `setup.py --type errors` til þess að sækja villur í texta og setja upp í SQLite-gagnagrunn.
+* `utils/noise_to_corpus.py --corpus /path/to/corpus/` til þess að setja gervivillur inn í texta.
+
+Dæmi um ljóslestrarvillur:
+
+
+| orig  | corr  | freq  |
+| :---: | :---: | :---: |
+|   p   |   þ   | 2779  |
+|   i   |   í   | 1141  |
+|  li   |   h   |  247  |
+|  rn   |   m   |  166  |
+|  ri   |   n   |  19   |
+
+Til þess að hægt sé að keyra `utils/noise_to_corpus.py` þarf uppbygging `path/to/corpus/` að vera með þessum hætti:
+
+```
+parent_dir
+└───original
+|
+└───corrected
+|    |    corrected_1.txt
+|    |    corrected_2.txt
+```
+
+Skjölin í `corrected` eru einfaldlega venjulegir textar, sem eru þá „leiðréttir“, þ.e. ekki er búið að setja í þá villur. Skriftan býr svo til „ljóslesnar“ útgáfur leiðréttu textanna, þ.e. setur inn í þá þekktar ljóslestrarvillur og vistar þær í `original`.
+
+Að þessu loknu þarf að harðkóða þjálfunargögnin inn í `globals.py` og keyra `python3 setup.py --type dataframes`.
+
+Ekki er hægt að deila þjálfunargögnunum vegna leyfismála en hægur leikur er að sækja gögn sem henta til þjálfunar í Risamálheildina. Athygli er þó vakin á því að mikið magn nútímatexta getur valdið því að líkönin fara að alhæfa um of og nútímavæða eldri stafsetningu.
+
+
+
+## Tilreiðing
+---
+WordPiece-tilreiðarann sem PyTorch-transformer-módelið styðst við er að finna í `ocr_tokenizers/`. Hægt er að þjálfa nýjan slíkan:
+
+`python3 train_wordpiece_tokenizer.py --vocab-size <fjöldi orðhluta> --min-freq <lágmarkstíðni orðhluta> --corpus <path/to/corpus/>`
+
+Þessi skrifta þjálfar tilreiðara og vistar hann í `ocr_tokenizers/`. Athugið að tilreiðarinn er harðkóðaður inni í `globals.py` og nauðsynlegt er að nota sama tilreiðarann við þjálfun og prófun.
 
 <br>
 <br>
@@ -30,16 +126,7 @@ Forritið á að virka að því sóttu og forritseiningum uppsettum (`python3 -
 * `train.py`: Þjálfar Transformer-líkan </br>
 * `infer.py --model <módel> --infile <ljóslesin textaskrá>`: Les yfir og leiðréttir ljóslesinn texta
 
-Sökum þess hve lítið magn leiðréttra ljóslesinna texta fyrirfinnst er hér gert ráð fyrir að notandi útvegi venjulega íslenska texta, t.d. úr [Risamálheildinni](https://repository.clarin.is/repository/xmlui/handle/20.500.12537/192), sem eru svo fylltir af villum úr ljóslestrargögnunum í `data/parallel/50k_gold`. Notandi þarf einnig sjálfur að sjá um að skipta gögunum í þjálfunar-, mats- og prófunargögn. Dæmi um ljóslestrarvillur:
-
-
-| orig | corr | freq |
-|:------:|:------:|:------:|
-|   p    |   þ  | 2779 |
-|   i   |    í  |  1141    |
-|   li   |   h   |  247    |
-|   rn   |   m   |  166    |
-|   ri   |   n   |  19    |
+Sökum þess hve lítið magn leiðréttra ljóslesinna texta fyrirfinnst er hér gert ráð fyrir að notandi útvegi venjulega íslenska texta, t.d. úr [Risamálheildinni](https://repository.clarin.is/repository/xmlui/handle/20.500.12537/192), sem eru svo fylltir af villum úr ljóslestrargögnunum í `data/parallel/50k_gold`. Notandi þarf einnig sjálfur að sjá um að skipta gögunum í þjálfunar-, mats- og prófunargögn. 
 
 ---
 
