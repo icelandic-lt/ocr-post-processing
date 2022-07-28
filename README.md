@@ -1,5 +1,7 @@
 # Leiðrétting ljóslestrarvillna
 
+Til þess að sækja ljóslestrarvilluleiðréttingarlíkönin þarf að nota [git lfs](https://git-lfs.github.com/).
+
 Þessi gagnahirsla inniheldur meðal annars:
 
 * tvö þjálfuð transformer-líkön (PyTorch og fairseq) til leiðréttingar á ljóslestrarvillum

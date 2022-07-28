@@ -126,7 +126,7 @@ def spelling_modernized(original_token, edited_token):
                     substitution_sequence.append(change)
                 except IndexError:
                     pass
-    return any([x in [('é', 'je'), ('s', 'z'), ('p', 'f')] for x in substitution_sequence])
+    return any([x in [('é', 'je'), ('s', 'z'), ('f', 'p')] for x in substitution_sequence])
 
 def sub_tokens_in_line(line):
     """
