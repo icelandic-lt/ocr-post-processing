@@ -17,9 +17,6 @@ def format_token_out(token, start_punct, end_punct):
 
 def clean_token(token):
     token_out = token.strip(extended_punctuation.replace('-', ''))
-    # hyphen_index = token.find('-')
-    # if hyphen_index:
-    #     print(hyphen_index)
     if token.endswith('-') and not token_out.endswith('-'):
         token_out += '-'
     if token.startswith('--'):

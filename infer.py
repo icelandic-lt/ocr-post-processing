@@ -12,10 +12,11 @@ from train import (text_transform,
 from globals import OCR_TOKENIZER, wordpiece_vocab, read_lines
 from utils.pair_lines import process_torch_lines
 from utils.lexicon_lookup import n_good_words, sub_tokens_in_line, makes_sense, exists_in_bin_or_old_words
-from utils.format import clean_token
+from utils.format import clean_token, clean_token, extended_punctuation
 from tqdm import tqdm
 from fairseq.models.transformer import TransformerModel
-
+from dehyphenate import merge_and_format
+from transformers import pipeline
 punctuation += "–„”—«»"
 
 
@@ -38,9 +39,7 @@ params = import_module(f'hyperparams.{Path(args.model).stem}')
 
 
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
 CHECKPOINT = torch.load(args.model, map_location=torch.device('cpu'))
-
 MODEL = Seq2SeqTransformer(params.NUM_ENCODER_LAYERS,
                            params.NUM_DECODER_LAYERS,
                            params.EMB_SIZE,
@@ -181,7 +180,9 @@ if __name__ == '__main__':
                 line_out = best_line[0]
             else:
                 line_out = torch_line
-            out_lines.append(line_out)
+            out_lines.append(line_out.rstrip())
+    out_lines_string = '\n'.join([l for l in out_lines]).replace('. ', '.\n').splitlines()
+    out_lines = merge_and_format(out_lines_string)
     with open(outfile, 'w', encoding='utf-8') as outf:
         for line_out in out_lines:
             if args.include_lexicon_lookup:
