@@ -41,9 +41,9 @@ def merge_words(sents):
                     if not last_token_exists:
                         try:
                             if token.endswith('-'):
-                                token = token[:-1]
-                            out_cand = token + sent[sent_part_index+1].split()[0]
-                            if exists_in_bin_or_old_words(clean_token(out_cand)):
+                                stripped_token = token[:-1]
+                            out_cand = stripped_token + sent[sent_part_index+1].split()[0]
+                            if exists_in_bin_or_old_words(clean_token(out_cand)) or token.endswith('-'):
                                 sent_out += f'{out_cand} '
                                 sent[sent_part_index+1] = ' '.join(sent[sent_part_index+1].split()[1:])
                             else:
