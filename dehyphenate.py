@@ -37,7 +37,7 @@ def merge_words(sents):
                 if not token_index == len_sent_part-1:
                     sent_out += f'{token} '
                 else:
-                    last_token_exists = exists_in_bin_or_old_words(clean_token(token)) and not token.endswith('-')
+                    last_token_exists = exists_in_bin_or_old_words(clean_token(token)) and not token.endswith('-') or clean_token(token).isdigit()
                     if not last_token_exists:
                         try:
                             if token.endswith('-'):

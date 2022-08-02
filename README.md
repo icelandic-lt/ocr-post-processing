@@ -5,12 +5,14 @@ Til þess að sækja ljóslestrarvilluleiðréttingarlíkönin þarf að nota [g
 Þessi gagnahirsla inniheldur meðal annars:
 
 * tvö þjálfuð transformer-líkön (PyTorch og fairseq) til leiðréttingar á ljóslestrarvillum
-* `infer.py` til að leiðrétta ljóslestrarvillur
+* `infer.py --model path/to/model` til að leiðrétta ljóslestrarvillur
 * `train.py` til að þjálfa transformer-líkön (PyTorch)
 
 Tólið á að virka að forritseiningum uppsettum (`python3 -m pip install -r requirements.txt`) en til þess að þjálfa ný líkön þarf að útbúa þjálfunargögn (sjá [uppsetningu gagna](#uppsetning-gagna)).
 
-PyTorch-líkanið var þjálfað með WordPiece-tilreiðara og fairseq með SentencePiece, báðum skipt í 3000 einingar. Fyrrnefnda líkanið nær meiri nákvæmni með tilliti til bókstafa en hið síðarnefnda sé litið til orða.
+PyTorch-líkanið var þjálfað með WordPiece-tilreiðara og fairseq með SentencePiece, báðum skipt í 3000 einingar. Fyrrnefnda líkanið stendur sig betur sé mælikvarðinn chrF en hið síðarnefnda er nákvæmara sé litið til BLEU.
+
+Skriftan `train.py` þjálfar einungis PyTorch-líkan.
 
 Í núverandi mynd nær leiðréttingartólið þessum árangri með prófunargögnin til hliðsjónar:
 
@@ -19,7 +21,7 @@ PyTorch-líkanið var þjálfað með WordPiece-tilreiðara og fairseq með Sent
     <th></th>
     <th>PyTorch</th>
     <th>fairseq</th>
-    <th>Combined</th>
+    <th>Saman</th>
   </tr>
   
   <tr>
@@ -58,7 +60,7 @@ PyTorch-líkanið var þjálfað með WordPiece-tilreiðara og fairseq með Sent
 
 <br>
 
-Líkönin voru þjálfuð á u.þ.b. 900.000 línum (~7.000.000 orð) en af þeim voru ekki nema um 50.000 (~400.000 orð) úr raunverulegum ljóslesnum gögnum. Ætla má að aukið magn slíkra gagna gæti bætt tólið umtalsvert.
+Líkönin voru þjálfuð á u.þ.b. 900.000 línum (~7.000.000 orð) en af þeim voru ekki nema um 50.000 (~400.000 orð) úr raunverulegum ljóslesnum gögnum. Ætla má að aukið magn slíkra gagna geti bætt tólið umtalsvert.
 <br>
 <br>
 
@@ -91,7 +93,7 @@ parent_dir
 |    |    corrected_2.txt
 ```
 
-Skjölin í `corrected` eru einfaldlega venjulegir textar, sem eru þá „leiðréttir“, þ.e. ekki er búið að setja í þá villur. Skriftan býr svo til „ljóslesnar“ útgáfur leiðréttu textanna, þ.e. setur inn í þá þekktar ljóslestrarvillur og vistar þær í `original`.
+Skjölin í `corrected` eru einfaldlega venjulegir textar, sem eru þá „leiðréttir“, þ.e. ekki er búið að setja í þá villur. Skriftan býr svo til „ljóslesnar“ útgáfur leiðréttu textanna, þ.e. setur inn í þá þekktar ljóslestrarvillur, auk þess sem orð eru af handahófi slitin í sundur eða þeim skeytt saman, og vistar þær í `original`.
 
 Að þessu loknu þarf að harðkóða þjálfunargögnin inn í `globals.py` og keyra `python3 setup.py --type dataframes`.
 
