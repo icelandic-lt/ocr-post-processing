@@ -5,7 +5,7 @@ Til þess að sækja ljóslestrarvilluleiðréttingarlíkönin þarf að nota [g
 Þessi gagnahirsla inniheldur meðal annars:
 
 * tvö þjálfuð transformer-líkön (PyTorch og fairseq) til leiðréttingar á ljóslestrarvillum
-* `infer.py --model path/to/model` til að leiðrétta ljóslestrarvillur
+* `infer.py --model path/to/model --infile /path/to/ocred/file` til að leiðrétta ljóslestrarvillur
 * `train.py` til að þjálfa transformer-líkön (PyTorch)
 
 Tólið á að virka að forritseiningum uppsettum (`python3 -m pip install -r requirements.txt`) en til þess að þjálfa ný líkön þarf að útbúa þjálfunargögn (sjá [uppsetningu gagna](#uppsetning-gagna)).

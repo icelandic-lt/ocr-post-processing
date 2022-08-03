@@ -15,7 +15,6 @@ CORRECTED_FILES = 'data/1m/training/corrected'
 ORIGINAL_VAL_FILES = 'data/1m/validation/original'
 CORRECTED_VAL_FILES = 'data/1m/validation/corrected'
 
-# These files don't exist when setup.py is run.
 
 def get_vocab(vocab_file):
     with open(vocab_file, 'r') as vocab:

@@ -19,7 +19,8 @@ for i in lines:
         x = parsed.tree.view
         counter += 1
     except AttributeError:
-        pass
+        with open('bad_sentences.txt', 'a', encoding='utf-8') as outfile:
+            outfile.write(i + '\n')
 
 
 print(f'[{counter}/{len(lines)}]')

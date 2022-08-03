@@ -40,9 +40,9 @@ EOS_IDX = SPECIAL_SYMBOLS.index('<eos>')
 
 
 
-with open('data/dev_source.vocab', 'rb') as infile:
+with open(f'data/dev_source_{TOKENIZER_INFO}.vocab', 'rb') as infile:
     src_vocab = pickle.load(infile)
-with open('data/dev_target.vocab', 'rb') as infile:
+with open(f'data/dev_target_{TOKENIZER_INFO}.vocab', 'rb') as infile:
     tgt_vocab = pickle.load(infile)
 
 token_transform = {}
@@ -69,7 +69,6 @@ def sequential_transforms(*transforms):
         return txt_input
     return func
 
-# function to add BOS/EOS and create tensor for input sequence indices
 def tensor_transform(token_ids: List[int]):
     return torch.cat((torch.LongTensor([BOS_IDX]),
                       torch.LongTensor(token_ids),
