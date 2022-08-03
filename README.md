@@ -59,11 +59,8 @@ Skriftan `train.py` þjálfar einungis PyTorch-líkan.
 </table>
 (ERR = Error Rate Reduction: fækkun ljóslestrarvillna í prósentum talið)
 
-<br>
-
 Líkönin voru þjálfuð á u.þ.b. 900.000 línum (~7.000.000 orð) en af þeim voru ekki nema um 50.000 (~400.000 orð) úr raunverulegum ljóslesnum gögnum. Ætla má að aukið magn slíkra gagna geti bætt tólið umtalsvert.
-<br>
-<br>
+
 
 ## Uppsetning gagna
 
