@@ -98,21 +98,16 @@ Skjölin í `corrected` eru einfaldlega venjulegir textar, sem eru þá „leið
 
 Að þessu loknu þarf að harðkóða slóð þjálfunargagnanna inn í `globals.py` og keyra `python3 setup.py --type dataframes`.
 
-Ekki er hægt að deila þjálfunargögnunum vegna leyfismála en hægur leikur er að sækja gögn sem henta til þjálfunar í Risamálheildina. Athygli er þó vakin á því að mikið magn nútímatexta getur valdið því að líkönin fara að alhæfa um of og nútímavæða eldri stafsetningu.
+Ekki er hægt að deila þjálfunargögnunum vegna leyfismála en hægur leikur er að sækja gögn sem henta til þjálfunar í Risamálheildina. Athygli er þó vakin á því að mikið magn nútímatexta getur valdið því að líkönin fara að alhæfa um of og nútímavæða eldri stafsetningu. Notandi þarf sjálfur að sjá um að skipta gögunum í þjálfunar-, mats- og prófunargögn. 
+
 
 
 
 ## Tilreiðing
----
+
 WordPiece-tilreiðarann sem PyTorch-transformer-módelið styðst við er að finna í `ocr_tokenizers/`. Hægt er að þjálfa nýjan slíkan:
 
 `python3 train_wordpiece_tokenizer.py --vocab-size <fjöldi orðhluta> --min-freq <lágmarkstíðni orðhluta> --corpus <path/to/corpus/>`
 
 Þessi skrifta þjálfar tilreiðara og vistar hann í `ocr_tokenizers/`. Athugið að tilreiðarinn er harðkóðaður inni í `globals.py` og nauðsynlegt er að nota sama tilreiðarann við þjálfun og prófun.
-
-
-
-Sökum þess hve lítið magn leiðréttra ljóslesinna texta fyrirfinnst er hér gert ráð fyrir að notandi útvegi venjulega íslenska texta, t.d. úr [Risamálheildinni](https://repository.clarin.is/repository/xmlui/handle/20.500.12537/192), sem eru svo fylltir af villum úr ljóslestrargögnunum í `data/parallel/50k_gold`. Notandi þarf einnig sjálfur að sjá um að skipta gögunum í þjálfunar-, mats- og prófunargögn. 
-
----
 
