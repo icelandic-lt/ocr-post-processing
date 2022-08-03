@@ -148,7 +148,6 @@ def train_epoch(model, train_optimizer, training_dataset):
         loss.backward()
         train_optimizer.step()
         losses += loss.item()
-    #SCHEDULER.step()
     return losses / len(train_dataloader)
 
 

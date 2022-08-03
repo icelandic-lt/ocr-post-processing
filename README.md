@@ -65,11 +65,11 @@ Líkönin voru þjálfuð á u.þ.b. 900.000 línum (~7.000.000 orð) en af þei
 <br>
 
 ## Uppsetning gagna
----
-Sökum skorts raungagna á forminu **ljóslesinn/leiðréttur texti** voru gervivillur (e. artificial errors) settar inn í texta sem m.a. voru sóttir úr [Risamálheildinni](https://repository.clarin.is/repository/xmlui/handle/20.500.12537/192). Villurnar voru fengnar úr þeim ljóslesnu/leiðréttu gögnum sem til eru. Eftirfarandi skriftur má nota í þeim tilgangi:
+
+Sökum skorts raungagna á forminu **ljóslesinn/leiðréttur texti** voru gervivillur (e. artificial errors) settar inn í texta sem m.a. voru sóttir úr [Risamálheildinni](https://repository.clarin.is/repository/xmlui/handle/20.500.12537/192). Villurnar voru fengnar úr þeim ljóslesnu/leiðréttu gögnum sem til eru (`data/parallel/50k_gold/`). Eftirfarandi skriftur má nota í þeim tilgangi:
 
 * `setup.py --type errors` til þess að sækja villur í texta og setja upp í SQLite-gagnagrunn.
-* `utils/noise_to_corpus.py --corpus /path/to/corpus/` til þess að setja gervivillur inn í texta.
+* `utils/noise_to_corpus.py --corpus path/to/corpus/` til þess að setja gervivillur inn í texta.
 
 Dæmi um ljóslestrarvillur:
 
@@ -95,7 +95,7 @@ parent_dir
 
 Skjölin í `corrected` eru einfaldlega venjulegir textar, sem eru þá „leiðréttir“, þ.e. ekki er búið að setja í þá villur. Skriftan býr svo til „ljóslesnar“ útgáfur leiðréttu textanna, þ.e. setur inn í þá þekktar ljóslestrarvillur, auk þess sem orð eru af handahófi slitin í sundur eða þeim skeytt saman, og vistar þær í `original`.
 
-Að þessu loknu þarf að harðkóða þjálfunargögnin inn í `globals.py` og keyra `python3 setup.py --type dataframes`.
+Að þessu loknu þarf að harðkóða slóð þjálfunargagnanna inn í `globals.py` og keyra `python3 setup.py --type dataframes`.
 
 Ekki er hægt að deila þjálfunargögnunum vegna leyfismála en hægur leikur er að sækja gögn sem henta til þjálfunar í Risamálheildina. Athygli er þó vakin á því að mikið magn nútímatexta getur valdið því að líkönin fara að alhæfa um of og nútímavæða eldri stafsetningu.
 

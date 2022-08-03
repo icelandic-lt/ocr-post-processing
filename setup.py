@@ -11,6 +11,9 @@ from globals import (read_files,
                      ORIGINAL_VAL_FILES,
                      CORRECTED_VAL_FILES,
                      TOKENIZER_INFO)
+from ocr_dataset import OCRDataset
+SRC_LANGUAGE = 'original'
+TGT_LANGUAGE = 'corrected'
 
 
 parser = argparse.ArgumentParser()
@@ -34,6 +37,12 @@ if __name__ == '__main__':
         training_data['original'] = list(read_files(ORIGINAL_FILES, tokenizer=tokenize))
         training_data['corrected'] = list(read_files(CORRECTED_FILES, tokenizer=tokenize))
         training_data.to_pickle(f'dataframes/training_data_{TOKENIZER_INFO}.pickle')
+        TRAINING_DATASET = OCRDataset(df=training_data, source_column=SRC_LANGUAGE, target_column=TGT_LANGUAGE)
+        
+        with open(f'data/dev_source_{TOKENIZER_INFO}.vocab', 'wb') as src_file:
+            pickle.dump(TRAINING_DATASET.source_vocab, src_file)
+        with open(f'data/dev_target_{TOKENIZER_INFO}.vocab', 'wb') as tgt_file:
+            pickle.dump(TRAINING_DATASET.target_vocab, tgt_file)
 
         print('> Building validation dataframe')
         validation_data = pandas.DataFrame()
