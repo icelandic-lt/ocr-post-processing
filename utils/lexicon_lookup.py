@@ -123,10 +123,20 @@ def spelling_modernized(original_token, edited_token):
                     original = original_token[i1:i2]
                     sub = edited_token[j1:j2]
                     change = sub, original
+                    print(change)
                     substitution_sequence.append(change)
                 except IndexError:
                     pass
-    return any([x in [('é', 'je'), ('s', 'z'), ('p', 'f')] for x in substitution_sequence])
+            elif tag == 'insert':
+                try:
+                    original = original_token[i1:i2]
+                    sub = edited_token[j1:j2]
+                    change = sub, original
+                    print(change)
+                    #substitution_sequence.append(change)
+                except IndexError:
+                    pass
+    return any([x in [('é', 'je'), ('s', 'z'), ('f', 'p'), ('i', 'y'), ('n', ''), ('g', ''), ('l', '')] for x in substitution_sequence])
 
 def sub_tokens_in_line(line):
     """
@@ -184,32 +194,37 @@ def sub_tokens_in_line(line):
     return line_out.strip()
 
 if __name__ == '__main__':
-    test_string = [
-        'Kosninpúrslifin',
-        'og ÞJóðviljinn',
-        'ÞJÓÐVILJINN reynir í frétt',
-        'og forustugrein í gær að telja',
-        'Ritstjórnarsímar: 4091, 4902.',
-        'Auglýsingar: Emilía Möller.',
-        'Auglýsingasími: 4906.',
-        'kaupstaðarins. Úrslitin á öðr-',
-        'um stöðum ræðir blaðið ekki,',
-        'nema hvað það birtir kosninga-',
-        'tölmmar nú og 1946. Ástæðan',
-        'liggur í augum uppi: Komm-',
-        'únistar hafa beðið ósigur um',
-        'land allt, þegar Norðfjörður er',
-        'undanskiIinn!   •',
-        'Ö1 og vindlar',
-        'altaf á fartinni hjá',
-        'E. Einarssyni.',
-        'og fleira ef þarf.',
-        ':,: Mennirnir eru hér í kjörsíaðnum okkar',
-        '-„Jafnaðarmannsins“—er fyrsta',
-        'Þetta er saga jafnaðar-',
-        'Ég elska NY-hunda',
-        'Þeir töpuðu 632 at-!',
-        'Úrgefandi: Jón Jónsson'
-    ]
-    for line in test_string:
-        print(sub_tokens_in_line(line))
+    # test_string = [
+    #     'Kosninpúrslifin',
+    #     'og ÞJóðviljinn',
+    #     'ÞJÓÐVILJINN reynir í frétt',
+    #     'og forustugrein í gær að telja',
+    #     'Ritstjórnarsímar: 4091, 4902.',
+    #     'Auglýsingar: Emilía Möller.',
+    #     'Auglýsingasími: 4906.',
+    #     'kaupstaðarins. Úrslitin á öðr-',
+    #     'um stöðum ræðir blaðið ekki,',
+    #     'nema hvað það birtir kosninga-',
+    #     'tölmmar nú og 1946. Ástæðan',
+    #     'liggur í augum uppi: Komm-',
+    #     'únistar hafa beðið ósigur um',
+    #     'land allt, þegar Norðfjörður er',
+    #     'undanskiIinn!   •',
+    #     'Ö1 og vindlar',
+    #     'altaf á fartinni hjá',
+    #     'E. Einarssyni.',
+    #     'og fleira ef þarf.',
+    #     ':,: Mennirnir eru hér í kjörsíaðnum okkar',
+    #     '-„Jafnaðarmannsins“—er fyrsta',
+    #     'Þetta er saga jafnaðar-',
+    #     'Ég elska NY-hunda',
+    #     'Þeir töpuðu 632 at-!',
+    #     'Úrgefandi: Jón Jónsson'
+    # ]
+    # for line in test_string:
+    #     print(sub_tokens_in_line(line))
+    print(spelling_modernized('fjemenn', 'fémenn'))
+    print(spelling_modernized('veizla', 'veisla'))
+    print(spelling_modernized('aptur', 'aftur'))
+    print(spelling_modernized('bygt', 'byggt'))
+    print(spelling_modernized('styrður', 'stirður'))
