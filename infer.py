@@ -131,6 +131,14 @@ if __name__ == '__main__':
     inp_filename = Path(inp_file).name
     model_name = Path(args.model).stem
     outfile = f'test_data/outputs/{model_name}_{inp_filename}'
+    one_model = None
+    if args.torch_only:
+        one_model = 'torch_only'
+    elif args.fairseq_only:
+        one_model = 'fairseq_only'
+    outfile = f'test_data/outputs/{model_name}_{inp_filename}'
+    if one_model:
+        outfile += one_model
     sents = list(read_lines(inp_file, OCR_TOKENIZER))
     COUNTER = 0
     N_LINES = len(sents)
