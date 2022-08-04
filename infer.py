@@ -189,8 +189,8 @@ if __name__ == '__main__':
             else:
                 line_out = torch_line
             out_lines.append(line_out.rstrip())
-    out_lines_string = '\n'.join([l for l in out_lines]).replace('. ', '.\n').splitlines()
-    out_lines = merge_and_format(out_lines_string)
+    #out_lines_string = '\n'.join([l for l in out_lines]).replace('. ', '.\n').splitlines()
+    #out_lines = merge_and_format(out_lines_string)
     with open(outfile, 'w', encoding='utf-8') as outf:
         for line_out in out_lines:
             if args.include_lexicon_lookup:

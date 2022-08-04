@@ -40,9 +40,9 @@ EOS_IDX = SPECIAL_SYMBOLS.index('<eos>')
 
 
 
-with open(f'data/dev_source_{TOKENIZER_INFO}.vocab', 'rb') as infile:
+with open(f'data/dev_source.vocab', 'rb') as infile:
     src_vocab = pickle.load(infile)
-with open(f'data/dev_target_{TOKENIZER_INFO}.vocab', 'rb') as infile:
+with open(f'data/dev_target.vocab', 'rb') as infile:
     tgt_vocab = pickle.load(infile)
 
 token_transform = {}
