@@ -32,6 +32,7 @@ parser.add_argument('--infile')
 parser.add_argument('-l', '--include-lexicon-lookup', action='store_true')
 parser.add_argument('-f', '--fairseq-only', action='store_true')
 parser.add_argument('-t', '--torch-only', action='store_true')
+parser.add_argument('-m', '--merge-lines', action='store_true')
 args, unknown = parser.parse_known_args()
 
 
@@ -137,7 +138,9 @@ if __name__ == '__main__':
         one_model = 'fairseq_only'
     outfile = f'test_data/outputs/{model_name}_{inp_filename}'
     if one_model:
-        outfile += one_model
+        outfile = f'test_data/outputs/{model_name}_{one_model}_{inp_filename}'
+    if args.include_lexicon_lookup:
+        outfile = f'test_data/outputs/{model_name}_{one_model}_lexicon_lookup_{inp_filename}'
     sents = list(read_lines(inp_file, OCR_TOKENIZER))
     COUNTER = 0
     N_LINES = len(sents)
@@ -173,7 +176,7 @@ if __name__ == '__main__':
                     transformed_n_good_words = n_good_words(torch_line)
                 except ZeroDivisionError:
                     transformed_n_good_words = 0
-                
+
                 try:
                     frsq_n_good_words = n_good_words(frsq_line)
                 except ZeroDivisionError:
@@ -183,14 +186,15 @@ if __name__ == '__main__':
                     modified_n_good_words = n_good_words(tmp_line_out)
                 except ZeroDivisionError:
                     modified_n_good_words = 0
-                
+
                 best_line = max([(tmp_line_out, modified_n_good_words), (torch_line, transformed_n_good_words), (frsq_line, frsq_n_good_words)], key=lambda x: x[1])
                 line_out = best_line[0]
             else:
                 line_out = torch_line
             out_lines.append(line_out.rstrip())
-    #out_lines_string = '\n'.join([l for l in out_lines]).replace('. ', '.\n').splitlines()
-    #out_lines = merge_and_format(out_lines_string)
+    if args.merge_lines:
+        out_lines_string = '\n'.join([l for l in out_lines]).replace('. ', '.\n').splitlines()
+        out_lines = merge_and_format(out_lines_string)
     with open(outfile, 'w', encoding='utf-8') as outf:
         for line_out in out_lines:
             if args.include_lexicon_lookup:
