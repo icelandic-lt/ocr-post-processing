@@ -15,7 +15,7 @@ PyTorch-líkanið var þjálfað með WordPiece-tilreiðara og fairseq með Sent
 
 Skriftan `train.py` þjálfar einungis PyTorch-líkan.
 
-Í núverandi mynd nær leiðréttingartólið þessum árangri með prófunargögnin til hliðsjónar:
+Í núverandi mynd nær leiðréttingartólið þessum árangri með prófunargögn frá 19. öld til hliðsjónar:
 
 <table>
   <tr>
@@ -50,13 +50,45 @@ Skriftan `train.py` þjálfar einungis PyTorch-líkan.
     <td>47.24</td>
     <td>44.74</td>
   </tr>
-    <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
+</table>
+
+Og þessum árangri á prófunargögnum frá 1980-1999:
+<table>
+  <tr>
+    <th></th>
+    <th>PyTorch</th>
+    <th>fairseq</th>
+    <th>Saman</th>
+  </tr>
+  
+  <tr>
+    <th>chrF</th>
+    <td>96.83</td>
+    <td>96.58</td>
+    <td>96.85</td>
+  </tr>
+  
+  <tr>
+    <th>chrF ERR</th>
+    <td>33.8</td>
+    <td>28.6</td>
+    <td>34.2</td>
+  </tr>
+  <tr>
+    <th>BLEU</th>
+    <td>98.45</td>
+    <td>98.54</td>
+    <td>98.46</td>
+    </tr>
+  <tr>
+    <th>BLEU ERR</th>
+    <td>31.92</td>
+    <td>36.14</td>
+    <td>32.27</td>
   </tr>
 </table>
+
+
 (ERR = Error Rate Reduction: fækkun ljóslestrarvillna í prósentum talið)
 
 Líkönin voru þjálfuð á u.þ.b. 900.000 línum (~7.000.000 orð) en af þeim voru ekki nema um 50.000 (~400.000 orð) úr raunverulegum ljóslesnum gögnum. Ætla má að aukið magn slíkra gagna geti bætt tólið umtalsvert.
