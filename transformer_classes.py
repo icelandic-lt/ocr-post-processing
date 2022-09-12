@@ -1,3 +1,5 @@
+# These classes are from PyTorch: https://github.com/pytorch/tutorials/blob/master/beginner_source/translation_transformer.py
+
 import math
 import torch.nn as nn
 import torch

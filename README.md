@@ -11,7 +11,7 @@ Til þess að sækja ljóslestrarvilluleiðréttingarlíkönin þarf að nota [g
 
 Hægt er að nota tólið að forritseiningum uppsettum (`python3 -m pip install -r requirements.txt`) en til þess að þjálfa ný líkön þarf að útbúa þjálfunargögn (sjá [uppsetningu gagna](#uppsetning-gagna)).
 
-PyTorch-líkanið var þjálfað með WordPiece-tilreiðara og fairseq með SentencePiece, báðum skipt í 3000 einingar. Fyrrnefnda líkanið stendur sig betur sé mælikvarðinn chrF en hið síðarnefnda er nákvæmara sé litið til BLEU.
+PyTorch-líkanið var þjálfað með WordPiece-tókara og fairseq með SentencePiece, báðum skipt í 3000 einingar. Fyrrnefnda líkanið stendur sig betur sé mælikvarðinn chrF en hið síðarnefnda er nákvæmara sé litið til BLEU.
 
 Skriftan `train.py` þjálfar einungis PyTorch-líkan.
 
@@ -127,16 +127,16 @@ Skjölin í `corrected` eru einfaldlega venjulegir textar, sem eru þá „leið
 
 Að þessu loknu þarf að harðkóða slóð þjálfunargagnanna inn í `globals.py` og keyra `python3 setup.py --type dataframes`.
 
-Ekki er hægt að deila þjálfunargögnunum vegna leyfismála en hægur leikur er að sækja gögn sem henta til þjálfunar í Risamálheildina. Athygli er þó vakin á því að mikið magn nútímatexta getur valdið því að líkönin fara að alhæfa um of og nútímavæða eldri stafsetningu. Notandi þarf sjálfur að sjá um að skipta gögunum í þjálfunar-, mats- og prófunargögn. 
+Ekki er hægt að deila öllum þjálfunargögnunum vegna leyfismála en hægur leikur er að sækja gögn sem henta til þjálfunar í Risamálheildina. Athygli er þó vakin á því að mikið magn nútímatexta getur valdið því að líkönin fara að alhæfa um of og nútímavæða eldri stafsetningu. Notandi þarf sjálfur að skipta gögunum í þjálfunar-, mats- og prófunargögn. 
 
 
 
 
-## Tilreiðing
+## Tókun
 
-WordPiece-tilreiðarann sem PyTorch-transformer-módelið styðst við er að finna í `ocr_tokenizers/`. Hægt er að þjálfa nýjan slíkan:
+WordPiece-tókarann sem PyTorch-transformer-módelið styðst við er að finna í `ocr_tokenizers/`. Hægt er að þjálfa nýjan slíkan:
 
 `python3 train_wordpiece_tokenizer.py --vocab-size <fjöldi orðhluta> --min-freq <lágmarkstíðni orðhluta> --corpus <path/to/corpus/>`
 
-Þessi skrifta þjálfar tilreiðara og vistar hann í `ocr_tokenizers/`. Athugið að tilreiðarinn er harðkóðaður inni í `globals.py` og nauðsynlegt er að nota sama tilreiðarann við þjálfun og prófun.
+Þessi skrifta þjálfar tókara og vistar hann í `ocr_tokenizers/`. Athugið að tókarinn er harðkóðaður inni í `globals.py` og nauðsynlegt er að nota sama tókarann við þjálfun og prófun.
 

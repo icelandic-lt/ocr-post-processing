@@ -62,7 +62,7 @@ PAD_IDX = special_symbols.index('<pad>')
 BOS_IDX = special_symbols.index('<bos>')
 EOS_IDX = special_symbols.index('<eos>')
 
-
+# This function comes from PyTorch: https://github.com/pytorch/tutorials/blob/master/beginner_source/translation_transformer.py
 def greedy_decode(model, src, src_mask, max_len, start_symbol):
     src = src.to(DEVICE)
     src_mask = src_mask.to(DEVICE)
@@ -93,6 +93,8 @@ def detokenize(line):
     return line
 
 
+# This function is a modified version of the translate function found here: 
+# https://github.com/pytorch/tutorials/blob/master/beginner_source/translation_transformer.py
 def translate(model: torch.nn.Module, src_sentence: str):
     model.eval()
     src = text_transform[SRC_LANGUAGE](src_sentence).view(-1, 1)

@@ -12,7 +12,6 @@ from torch.utils.data import DataLoader
 import torch
 from torch.nn.utils.rnn import pad_sequence
 from transformers import BertTokenizer
-#from torch.optim.lr_scheduler import StepLR
 import params
 from ocr_dataset import OCRDataset
 from transformer_classes import Seq2SeqTransformer
@@ -62,6 +61,7 @@ SRC_VOCAB_SIZE = len(vocab_transform[SRC_LANGUAGE])
 TGT_VOCAB_SIZE = len(vocab_transform[TGT_LANGUAGE])
 
 # Transforms = token_transform[SRC/TGT_LANGUAGE], vocab_transform[SRC/TGT_LANGUAGE], tensor_transform
+# This function comes from PyTorch: https://github.com/pytorch/tutorials/blob/master/beginner_source/translation_transformer.py
 def sequential_transforms(*transforms):
     def func(txt_input):
         for transform in transforms:
@@ -69,6 +69,7 @@ def sequential_transforms(*transforms):
         return txt_input
     return func
 
+# This function comes from PyTorch: https://github.com/pytorch/tutorials/blob/master/beginner_source/translation_transformer.py
 def tensor_transform(token_ids: List[int]):
     return torch.cat((torch.LongTensor([BOS_IDX]),
                       torch.LongTensor(token_ids),
@@ -85,6 +86,7 @@ text_transform[TGT_LANGUAGE] = sequential_transforms(
                                     tensor_transform)
 
 
+# The function comes from PyTorch: https://github.com/pytorch/tutorials/blob/master/beginner_source/translation_transformer.py
 def create_mask(src, tgt):
     src_seq_len = src.shape[0]
     tgt_seq_len = tgt.shape[0]
@@ -105,20 +107,23 @@ TRANSFORMER = Seq2SeqTransformer(params.NUM_ENCODER_LAYERS,
                                  params.FFN_HID_DIM,
                                  params.DROPOUT)
 
+# https://github.com/pytorch/tutorials/blob/master/beginner_source/translation_transformer.py
 for p in TRANSFORMER.parameters():
     if p.dim() > 1:
         nn.init.xavier_uniform_(p)
 
-
+# https://github.com/pytorch/tutorials/blob/master/beginner_source/translation_transformer.py
 TRANSFORMER = TRANSFORMER.to(DEVICE)
 loss_fn = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
 
+# https://github.com/pytorch/tutorials/blob/master/beginner_source/translation_transformer.py
 OPTIMIZER = Adam(TRANSFORMER.parameters(),
                  lr=params.LEARNING_RATE,
                  betas=(0.9, 0.98),
                  eps=1e-9)
 
 
+# https://github.com/pytorch/tutorials/blob/master/beginner_source/translation_transformer.py
 def collate_fn(batch):
     src_batch, tgt_batch = [], []
     for src_sample, tgt_sample in batch:
@@ -128,7 +133,7 @@ def collate_fn(batch):
     tgt_batch = pad_sequence(tgt_batch, padding_value=PAD_IDX)
     return src_batch, tgt_batch
 
-
+# https://github.com/pytorch/tutorials/blob/master/beginner_source/translation_transformer.py
 def train_epoch(model, train_optimizer, training_dataset):
     model.train()
     losses = 0
@@ -150,7 +155,7 @@ def train_epoch(model, train_optimizer, training_dataset):
         losses += loss.item()
     return losses / len(train_dataloader)
 
-
+# https://github.com/pytorch/tutorials/blob/master/beginner_source/translation_transformer.py
 def evaluate(model):
     model.eval()
     losses = 0
