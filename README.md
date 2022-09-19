@@ -176,7 +176,7 @@ In its current state, the tool scores as follows (testing carried out on Iceland
     <th></th>
     <th>PyTorch</th>
     <th>fairseq</th>
-    <th>Saman</th>
+    <th>Combined</th>
   </tr>
   
   <tr>
@@ -206,13 +206,13 @@ In its current state, the tool scores as follows (testing carried out on Iceland
   </tr>
 </table>
 
-And as such when tested on Icelandic texts from the 80's and 90's:
+And as such when tested on Icelandic texts from the 1980's and 1990's:
 <table>
   <tr>
     <th></th>
     <th>PyTorch</th>
     <th>fairseq</th>
-    <th>Saman</th>
+    <th>Combined</th>
   </tr>
   
   <tr>
