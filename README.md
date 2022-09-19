@@ -156,14 +156,14 @@ To download the OCR post-processing models, you need [git lfs](https://git-lfs.g
 
 This repository contains:
 
-* tvö trained Transformer models (PyTorch og fairseq) to correct OCR errors
+* two trained Transformer models (PyTorch og fairseq) to correct OCR errors
 * `infer.py --model path/to/model --infile /path/to/ocred/file` to correct OCR errors
 * `train.py` to train a PyTorch Transformer model
 * Ca 50.000 lines of **OCRed/corrected texts**
 
 To use the tool, you need to install the requirements (`python3 -m pip install -r requirements.txt`), but to train a model you need to build training data (see [building training data](#building-training-data)).
 
-The PyTorch model was trained with a WordPiece tokenizer and the fairseq one with SentencePiece, both split into 3000 tokens. The former scores higher on chrF, but the latter on scores higher on BLEU.
+The PyTorch model was trained with a WordPiece tokenizer and the fairseq one with SentencePiece, both split into 3000 tokens. The former scores higher on chrF, but the latter scores higher on BLEU.
 
 The script `train.py` only trains a PyTorch model.
 
@@ -244,7 +244,7 @@ And as such when tested on Icelandic texts from the 80's and 90's:
 
 (ERR = Error Rate Reduction)
 
-The models where trained on ca 900.000 lines (~7.000.000 tokens) of which only 50.000 (~400.000 tokens) are from real OCRed texts. It can be assumed that increasing the amount of such data can significantly improve the tool.
+The models were trained on ca 900.000 lines (~7.000.000 tokens) of which only 50.000 (~400.000 tokens) were from real OCRed texts. It can be assumed that increasing the amount of such data can significantly improve the tool.
 
 
 ## Building training data
@@ -277,7 +277,7 @@ corpus
 |    |    corrected_2.txt
 ```
 
-The text files in `corrected` are simply normal texts, which are then "corrected", i.e. no errors have been added to them. Tje script than creates "OCRed" versions of them by adding known OCR errors into them, as well as randomly adding spaces into words and splicing others together, and saves them in `original`. 
+The text files in `corrected` are simply normal texts, which are then "corrected", i.e. no errors have been added to them. The script then creates an "OCRed" versions of them by adding known OCR errors into them, as well as randomly adding spaces into words and splicing others together, and saves them in `original`. 
 
 After this, you have to hardcode the path of the training data into `globals.py` and run `python3 setup.py --type dataframes`.
 
