@@ -1,6 +1,6 @@
 # Leiðrétting ljóslestrarvillna / OCR post-processing
 
-(English below.)
+[English below.](#ocr-post-processing)
 
 Til þess að sækja ljóslestrarvilluleiðréttingarlíkönin þarf að nota [git lfs](https://git-lfs.github.com/).
 
