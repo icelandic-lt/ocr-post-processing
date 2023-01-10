@@ -8,3 +8,4 @@ data/ocr_books_textasafn/
 utils/infer_helpers.py
 data/1m
 data_on_hold/
+best_byt5_models/
