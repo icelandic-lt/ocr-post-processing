@@ -37,7 +37,7 @@ def process_torch_lines(transformed_lines):
 
                 curr_secnd_half = None
                 next_first_half = None
-
+                
                 next_secnd_half = None
                 last_secnd_half = None
 
@@ -65,40 +65,37 @@ def process_torch_lines(transformed_lines):
                     # The following code block has to do with picking a line based on whether the first word in the following
                     # line and the last word in the current line can be conjoined into a single known word. If not, it picks
                     # curr_secnd_half
-                    try:
-                        if all([curr_secnd_half, next_first_half, next_secnd_half]):
-                            last_word_in_curr_secnd_half = curr_secnd_half.split()[-1]
-                            last_word_in_next_first_half = next_first_half.split()[-1] 
-                            first_word_in_next_secnd_half = next_secnd_half.split()[0]                    
-                            if last_word_in_curr_secnd_half.endswith('-'):
-                                last_word_in_curr_secnd_half = last_word_in_curr_secnd_half[:-1]
-                            if last_word_in_next_first_half.endswith('-'):
-                                last_word_in_next_first_half = last_word_in_next_first_half[:-1]
-                            combined_curr_secnd_next_secnd = last_word_in_curr_secnd_half + first_word_in_next_secnd_half
-                            combined_next_first_next_secnd = last_word_in_next_first_half + first_word_in_next_secnd_half
-                            if combined_curr_secnd_next_secnd != combined_next_first_next_secnd:
-                                if exists_in_bin_or_old_words(combined_next_first_next_secnd):
-                                    current_line_out = next_first_half
-                                else:
-                                    current_line_out = curr_secnd_half   
+                    if all([curr_secnd_half, next_first_half, next_secnd_half]):
+                        last_word_in_curr_secnd_half = curr_secnd_half.split()[-1]
+                        last_word_in_next_first_half = next_first_half.split()[-1] 
+                        first_word_in_next_secnd_half = next_secnd_half.split()[0]                    
+                        if last_word_in_curr_secnd_half.endswith('-'):
+                            last_word_in_curr_secnd_half = last_word_in_curr_secnd_half[:-1]
+                        if last_word_in_next_first_half.endswith('-'):
+                            last_word_in_next_first_half = last_word_in_next_first_half[:-1]
+                        combined_curr_secnd_next_secnd = last_word_in_curr_secnd_half + first_word_in_next_secnd_half
+                        combined_next_first_next_secnd = last_word_in_next_first_half + first_word_in_next_secnd_half
+                        if combined_curr_secnd_next_secnd != combined_next_first_next_secnd:
+                            if exists_in_bin_or_old_words(combined_next_first_next_secnd):
+                                current_line_out = next_first_half
+                            else:
+                                current_line_out = curr_secnd_half   
                     # The following block has to do with picking a line based on whether the last word in the preceding
                     # line and the first word in the current line can be conjoined into a single known word. If not,
                     # it picks curr_secnd_half
-                        if all([curr_secnd_half, next_first_half, last_secnd_half]):
-                            first_word_in_current_second_half = curr_secnd_half.split()[0]
-                            first_word_in_next_first_half = next_first_half.split()[0]
-                            last_word_in_last_second_half = last_secnd_half.split()[-1]
-                            if last_word_in_last_second_half.endswith('-'):
-                                last_word_in_last_second_half = last_word_in_last_second_half[:-1]
-                            combined_curr_secnd_last_secnd = last_word_in_last_second_half + first_word_in_current_second_half
-                            combined_next_first_last_secnd = last_word_in_last_second_half + first_word_in_next_first_half
-                            if combined_curr_secnd_last_secnd != combined_next_first_last_secnd:
-                                if exists_in_bin_or_old_words(combined_next_first_last_secnd):
-                                    current_line_out = next_first_half
-                                else:
-                                    current_line_out = curr_secnd_half
-                    except:
-                        current_line_out = curr_secnd_half
+                    if all([curr_secnd_half, next_first_half, last_secnd_half]):
+                        first_word_in_current_second_half = curr_secnd_half.split()[0]
+                        first_word_in_next_first_half = next_first_half.split()[0]
+                        last_word_in_last_second_half = last_secnd_half.split()[-1]
+                        if last_word_in_last_second_half.endswith('-'):
+                            last_word_in_last_second_half = last_word_in_last_second_half[:-1]
+                        combined_curr_secnd_last_secnd = last_word_in_last_second_half + first_word_in_current_second_half
+                        combined_next_first_last_secnd = last_word_in_last_second_half + first_word_in_next_first_half
+                        if combined_curr_secnd_last_secnd != combined_next_first_last_secnd:
+                            if exists_in_bin_or_old_words(combined_next_first_last_secnd):
+                                current_line_out = next_first_half
+                            else:
+                                current_line_out = curr_secnd_half
                 if current_line_out is not None and not ((current_index + 1) == n_lines and current_line_out == ''):
                     yield format_line_out(current_line_out, ocr_junk)
                 current_index += 1  

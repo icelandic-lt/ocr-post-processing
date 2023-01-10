@@ -34,9 +34,9 @@ def evaluate_chrf(original_file, corrected_file, transformed_file):
         'Corrected/Transformed CHRF:': corr_trns_chrf,
         'Improvement:': round((corr_trns_chrf - orig_corr_chrf), 7),
         'Prop improv:': round((corr_trns_chrf - orig_corr_chrf)/(1 - orig_corr_chrf), 7),
-        'F-Measure': round(f_meas, 7),
         'Precision': round(precis, 7),
         'Recall': round(rec, 7),
+        'F-Measure': round(f_meas, 7)
 
     }
     return scores
