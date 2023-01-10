@@ -204,39 +204,3 @@ if __name__ == '__main__':
             else:
                 line_out = line_out.rstrip()
             outf.write(line_out + '\n')
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    #    print(line)
-    #for i in transform_file(inp_file):
-    #    print(i)
-    #with open(outfile, 'w', encoding='utf-8') as outf:
-    #for sent in sents:
-        # encoded_sent = ' '.join(sent)
-        # translated_sent = translate(MODEL, encoded_sent)
-        # print(detokenize(translated_sent))
-        # COUNTER += 1
-        # encoded_sent = ' '.join(OCR_TOKENIZER(sent))
-        # print(f'[{COUNTER}/{N_LINES}]')
-        # outf.write(sent + '\n')
-        # outf.write(str(translate(MODEL, encoded_sent)) + '\n')
