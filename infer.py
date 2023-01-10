@@ -17,6 +17,8 @@ from tqdm import tqdm
 from fairseq.models.transformer import TransformerModel
 from dehyphenate import merge_and_format
 from transformers import pipeline
+from transformers.pipelines.pt_utils import KeyDataset
+from datasets import load_dataset
 punctuation += "–„”—«»"
 
 
@@ -33,14 +35,18 @@ parser.add_argument('-l', '--include-lexicon-lookup', action='store_true')
 parser.add_argument('-f', '--fairseq-only', action='store_true')
 parser.add_argument('-t', '--torch-only', action='store_true')
 parser.add_argument('-m', '--merge-lines', action='store_true')
+parser.add_argument('-b', '--byt5-only', action='store_true')
 args, unknown = parser.parse_known_args()
 
+
+BYT5_MODEL_PATH = f'best_byt5_models/byt5-is-ocr-post-processing-old-texts'
+BYT5_CORRECTION = pipeline('text2text-generation', model=BYT5_MODEL_PATH, tokenizer=BYT5_MODEL_PATH, num_return_sequences=1, device=0)
 
 params = import_module(f'hyperparams.{Path(args.model).stem}')
 
 
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-CHECKPOINT = torch.load(args.model, map_location=torch.device('cpu'))
+CHECKPOINT = torch.load(args.model, map_location=torch.device('cuda'))
 MODEL = Seq2SeqTransformer(params.NUM_ENCODER_LAYERS,
                            params.NUM_DECODER_LAYERS,
                            params.EMB_SIZE,
@@ -56,11 +62,15 @@ try:
 except KeyError:
     MODEL.load_state_dict(torch.load(args.model, map_location=torch.device('cpu')))
 MODEL.to(DEVICE)
+
+
 special_symbols = ['<unk>', '<pad>', '<bos>', '<eos>']
 UNK_IDX = special_symbols.index('<unk>')
 PAD_IDX = special_symbols.index('<pad>')
 BOS_IDX = special_symbols.index('<bos>')
 EOS_IDX = special_symbols.index('<eos>')
+
+
 
 # This function comes from PyTorch: https://github.com/pytorch/tutorials/blob/master/beginner_source/translation_transformer.py
 def greedy_decode(model, src, src_mask, max_len, start_symbol):
@@ -93,7 +103,7 @@ def detokenize(line):
     return line
 
 
-# This function is a modified version of the translate function found here: 
+# This function is a modified version of the translate function found here:
 # https://github.com/pytorch/tutorials/blob/master/beginner_source/translation_transformer.py
 def translate(model: torch.nn.Module, src_sentence: str):
     model.eval()
@@ -121,9 +131,21 @@ def fairseq_transform_file(file):
                                              data_name_or_path='frsq/data/data-bin.3000',
                                              bpe='sentencepiece',
                                              sentencepiece_model='frsq/data/sentencepiece/data/sentencepiece_3000.bpe.model')
-    for line in tqdm(list(read_file(file)), desc='[2/3]'):
-        transformed_sent = model.translate(line)
+    lines = list(read_file(file))
+    transformed = tqdm(model.translate(lines))
+    for transformed_sent in transformed:
+    #for line in tqdm(list(read_file(file)), desc='[2/3]'):
+        #transformed_sent = model.translate(line)
         yield transformed_sent
+
+def byt5_transform_file(file):
+    path = f'{Path(args.infile).parents[0]}/'
+    filename = Path(args.infile).name
+    dataset = load_dataset(path, data_files=filename)
+    lines = dataset['train']
+    file_length = len(lines)
+    for line in tqdm(BYT5_CORRECTION(KeyDataset(lines, 'text'), max_length=512, batch_size=32), total=file_length):
+        yield line[0]['generated_text']
 
 
 if __name__ == '__main__':
@@ -138,11 +160,14 @@ if __name__ == '__main__':
         one_model = 'torch_only'
     elif args.fairseq_only:
         one_model = 'fairseq_only'
+    elif args.byt5_only:
+        one_model = 'byt5_only'
     outfile = f'test_data/outputs/{model_name}_{inp_filename}'
     if one_model:
         outfile = f'test_data/outputs/{model_name}_{one_model}_{inp_filename}'
     if args.include_lexicon_lookup:
         outfile = f'test_data/outputs/{model_name}_{one_model}_lexicon_lookup_{inp_filename}'
+    #outfile = 'all_models.txt'
     sents = list(read_lines(inp_file, OCR_TOKENIZER))
     COUNTER = 0
     N_LINES = len(sents)
@@ -157,23 +182,31 @@ if __name__ == '__main__':
         frsq_file = list(fairseq_transform_file(inp_file))
         for line in frsq_file:
             out_lines.append(line)
+    elif args.byt5_only:
+        byt5_file = list(byt5_transform_file(args.infile))
+        for line in byt5_file:
+            out_lines.append(line)
     else:
         torch_file = list(transform_file(inp_file))
         frsq_file = list(fairseq_transform_file(inp_file))
-        for original_line, torch_line, frsq_line in tqdm(zip(original_file, process_torch_lines(torch_file), frsq_file), desc='[3/3]'):
+        byt5_file = list (byt5_transform_file(args.infile))
+        for original_line, torch_line, frsq_line, byt5_line in tqdm(zip(original_file, process_torch_lines(torch_file), frsq_file, byt5_file), desc='[3/3]'):
             line_out = ''
             torch_tokens = torch_line.split()
             frsq_tokens = frsq_line.split()
-            if len(torch_tokens) == len(frsq_tokens) and torch_tokens[-1] == frsq_tokens[-1]:
+            byt5_tokens = byt5_line.split()
+            if len(torch_tokens) == len(frsq_tokens) == len(byt5_tokens) and torch_tokens[-1] == frsq_tokens[-1] == byt5_tokens[-1]:
                 tmp_line_out = ''
-                for (index, (torch_tok, frqs_tok)) in enumerate(zip(torch_tokens, frsq_tokens)):
+                for (index, (torch_tok, frqs_tok, byt5_tok)) in enumerate(zip(torch_tokens, frsq_tokens, byt5_tokens)):
                     if index in [0, len(torch_tokens)]:
                         tmp_line_out += f'{torch_tok} '
                     else:
                         if exists_in_bin_or_old_words(clean_token(torch_tok)):
                             tmp_line_out += f'{torch_tok} '
-                        else:
+                        elif exists_in_bin_or_old_words(clean_token(frqs_tok)):
                             tmp_line_out += f'{frqs_tok} '
+                        else:
+                            tmp_line_out += f'{byt5_tok}'
                 try:
                     transformed_n_good_words = n_good_words(torch_line)
                 except ZeroDivisionError:
@@ -185,11 +218,16 @@ if __name__ == '__main__':
                     frsq_n_good_words = 0
 
                 try:
+                    byt5_n_good_words = n_good_words(byt5_line)
+                except ZeroDivisionError:
+                    byt5_n_good_words = 0
+
+                try:
                     modified_n_good_words = n_good_words(tmp_line_out)
                 except ZeroDivisionError:
                     modified_n_good_words = 0
 
-                best_line = max([(tmp_line_out, modified_n_good_words), (torch_line, transformed_n_good_words), (frsq_line, frsq_n_good_words)], key=lambda x: x[1])
+                best_line = max([(tmp_line_out, modified_n_good_words), (torch_line, transformed_n_good_words), (frsq_line, frsq_n_good_words), (byt5_line, byt5_n_good_words)], key=lambda x: x[1])
                 line_out = best_line[0]
             else:
                 line_out = torch_line
