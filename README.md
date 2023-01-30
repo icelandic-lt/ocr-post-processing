@@ -2,6 +2,10 @@
 
 [English below.](#ocr-post-processing)
 
+**Fyrir einfaldari og hraðvirkari ljóslestrarleiðréttingartól mæli ég með [þessu líkani](https://huggingface.co/atlijas/byt5-is-ocr-post-processing-old-texts) fyrir eldri texta og [þessu líkani](https://huggingface.co/atlijas/byt5-is-ocr-post-processing-modern-texts) fyrir nútímatexta, frekar en því sem er að finna í þessari gagnahirslu.**
+
+**For simpler and faster OCR post processing tools, I recommend using [this model](https://huggingface.co/atlijas/byt5-is-ocr-post-processing-old-texts) for historical texts and [this model](https://huggingface.co/atlijas/byt5-is-ocr-post-processing-modern-texts) for modern texts, instead of what this repository contains.**
+
 
 Til þess að sækja ljóslestrarvilluleiðréttingarlíkönin þarf að nota [git lfs](https://git-lfs.github.com/).
 
