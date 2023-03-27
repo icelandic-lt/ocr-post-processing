@@ -2,7 +2,7 @@ from string import punctuation
 from random import randrange, sample, choices
 from math import log
 from format import format_token_out
-from general_token import TextToken, get_char_errors, gen_non_overlapping_ngrams
+from tokens import TextToken, get_char_errors, gen_non_overlapping_ngrams
 punctuation += "–„”—«»"
 
 
@@ -34,7 +34,7 @@ def noise_file(file):
             # Random noise is added if swap is less than 1, i.e. in 10% of all tokens.
             swap = randrange(100) < 15
             out_tok = ''
-            for ngr in gen_non_overlapping_ngrams(token.clean, curr_ngr):
+            for ngr in gen_non_overlapping_ngrams(token.original_token, curr_ngr):
                 # out_ngr is initialized as an ngram from the (correct) token
                 out_ngr = ngr
                 if swap:
